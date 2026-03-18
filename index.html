@@ -46,10 +46,10 @@
             <div class="mb-2">
                 <span class="text-blue-600 font-bold text-xs tracking-[0.3em] uppercase">AIVA Academia</span>
             </div>
-            <h1 class="text-4xl font-black mb-2 text-blue-800 uppercase leading-none">VOXEL QUEST</h1>
+            <h1 class="text-4xl font-black mb-2 text-blue-800 uppercase leading-none text-pixel">VOXEL QUEST</h1>
             <p class="text-xs font-bold text-orange-500 mb-6 border-y-2 border-orange-100 py-1 uppercase tracking-widest">Constructor Tecnológico</p>
             
-            <input type="text" id="player-name" placeholder="Escribe tu nombre..." 
+            <input type="text" id="player-name" placeholder="Tu nombre..." 
                 class="w-full p-3 border-4 border-black mb-6 focus:outline-none focus:border-blue-500 font-bold text-center uppercase">
             
             <div class="flex flex-col gap-3">
@@ -65,28 +65,28 @@
 
     <!-- Modal de Instrucciones -->
     <div id="instructions-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-[110] p-4">
-        <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-blue-600 shadow-2xl">
-            <h2 class="text-2xl font-bold text-blue-700 mb-4 uppercase text-center tracking-tighter">Manual de AIVA Explorer</h2>
-            <div class="h-64 overflow-y-auto pr-2 custom-scrollbar text-sm space-y-4 text-slate-700">
-                <section class="bg-slate-50 p-3 border-l-4 border-blue-500 text-left">
+        <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-blue-600 shadow-2xl text-slate-800">
+            <h2 class="text-2xl font-bold text-blue-700 mb-4 uppercase text-center tracking-tighter">Guía de AIVA Explorer</h2>
+            <div class="h-64 overflow-y-auto pr-2 custom-scrollbar text-sm space-y-4">
+                <section class="bg-slate-50 p-3 border-l-4 border-blue-500">
                     <h3 class="font-bold text-blue-600 uppercase mb-1">🕹️ Caminar</h3>
-                    <p>Usa las <b>Flechas</b> o <b>WASD</b> para moverte por la isla.</p>
+                    <p>Usa <b>Flechas</b> o <b>WASD</b> para moverte por la isla.</p>
                 </section>
-                <section class="bg-slate-50 p-3 border-l-4 border-orange-500 text-left">
+                <section class="bg-slate-50 p-3 border-l-4 border-orange-500">
                     <h3 class="font-bold text-orange-500 uppercase mb-1">🎥 Vista (Nivel 5+)</h3>
                     <p><b>Rueda del Mouse:</b> Zoom.<br><b>Teclas Q / E:</b> Cambia la altura de la cámara.</p>
                 </section>
-                <section class="bg-slate-50 p-3 border-l-4 border-green-500 text-left">
+                <section class="bg-slate-50 p-3 border-l-4 border-green-500">
                     <h3 class="font-bold text-green-500 uppercase mb-1">🔨 Construir (Nivel 10+)</h3>
-                    <p>Mueve el objeto con <b>WASD</b>.<br>Gira con <b>1 / 2</b>.<br>Ponlo con <b>ESPACIO</b>.</p>
+                    <p>Mueve el objeto fantasma con <b>WASD</b>.<br>Gira con <b>1 / 2</b>.<br>Colócalo con <b>ESPACIO</b>.</p>
                 </section>
-                <section class="bg-slate-50 p-3 border-l-4 border-purple-500 text-left">
+                <section class="bg-slate-50 p-3 border-l-4 border-purple-500">
                     <h3 class="font-bold text-purple-500 uppercase mb-1">🚀 Vuelo (Nivel 15+)</h3>
                     <p>Usa <b>R</b> para subir y <b>F</b> para bajar.</p>
                 </section>
-                <section class="bg-blue-100 p-3 border-l-4 border-blue-700 text-left">
+                <section class="bg-blue-100 p-3">
                     <h3 class="font-bold text-blue-800 uppercase mb-1">💼 Nivel Office (20+)</h3>
-                    <p>¡Elige tu propio premio! Desbloquea incluso nubes voladoras tras responder sobre Word, Excel o PowerPoint.</p>
+                    <p>¡Elige tu premio! Podrás seleccionar incluso nubes voladoras tras responder sobre Word, Excel o PowerPoint.</p>
                 </section>
             </div>
             <button onclick="hideInstructions()" class="w-full mt-6 bg-blue-600 text-white font-bold py-3 px-6 pixel-border transition-colors interactive">
@@ -108,21 +108,20 @@
                     <p class="font-bold text-xs uppercase text-gray-500">Score: <span id="score-ui" class="text-green-600 text-sm font-black">0</span></p>
                     <p class="font-bold text-xs uppercase text-gray-500 col-span-2 mt-1" id="goal-text">Objetivo: <span id="pieces-ui" class="text-orange-500 text-sm">0</span>/<span id="target-ui">3</span></p>
                 </div>
-                <!-- Reincorporado style-ui para evitar error de null -->
                 <p class="text-[9px] font-bold mt-2 text-slate-400 tracking-[0.2em] uppercase border-t pt-1 italic">ESTILO: <span id="style-ui" class="text-blue-500 font-normal">NORMAL</span></p>
             </div>
 
             <div class="flex flex-col gap-2 items-end pointer-events-auto">
                 <div id="timer-box" class="bg-black text-white p-3 pixel-border hidden min-w-[120px] text-center border-blue-500 shadow-xl">
-                    <p class="text-[10px] uppercase font-bold text-blue-400">Tiempo</p>
+                    <p class="text-[10px] uppercase font-bold text-blue-400">Energía</p>
                     <p id="timer-ui" class="text-2xl font-black tracking-widest font-mono">00:60</p>
                 </div>
                 
                 <div class="flex gap-2">
-                    <button onclick="showInstructions()" id="btn-info" class="hidden bg-blue-600 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-blue-700 interactive shadow-md">
+                    <button onclick="showInstructions()" id="btn-info" class="hidden bg-blue-600 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-blue-700 interactive">
                         INFO
                     </button>
-                    <button onclick="togglePause()" id="btn-pause" class="hidden bg-yellow-500 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-yellow-600 interactive shadow-md">
+                    <button onclick="togglePause()" id="btn-pause" class="hidden bg-yellow-500 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-yellow-600 interactive">
                         PAUSA
                     </button>
                     <button onclick="showExitConfirm()" class="bg-red-500 text-white p-2 pixel-border font-bold text-xs hover:bg-red-600 hidden interactive shadow-md" id="btn-exit">
@@ -130,23 +129,23 @@
                     </button>
                 </div>
 
-                <div id="camera-hint" class="hidden bg-blue-500 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter">CÁMARA: RUEDA (ZOOM) | Q-E (ALTURA)</div>
-                <div id="build-hint" class="hidden bg-green-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter">CONSTRUCCIÓN: ESPACIO (PONER) | 1-2 (GIRAR)</div>
-                <div id="flight-hint" class="hidden bg-purple-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter">VUELO: R (SUBIR) | F (BAJAR)</div>
+                <div id="camera-hint" class="hidden bg-blue-500 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">CÁMARA: RUEDA (ZOOM) | Q-E (ALTURA)</div>
+                <div id="build-hint" class="hidden bg-green-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">CONSTRUCCIÓN: ESPACIO (PONER) | 1-2 (GIRAR)</div>
+                <div id="flight-hint" class="hidden bg-purple-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">VUELO: R (SUBIR) | F (BAJAR)</div>
             </div>
         </div>
 
         <!-- Selector de Objetos (Nivel 20+) -->
         <div id="object-select-modal" class="hidden fixed inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-[80] p-4">
-            <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-green-500 text-center shadow-2xl">
+            <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-green-500 text-center shadow-2xl text-slate-800">
                 <h2 class="text-2xl font-black text-green-700 mb-4 uppercase">ELIGE TU RECOMPENSA</h2>
-                <p class="text-sm text-slate-500 mb-6 font-bold uppercase tracking-tight">¡Has superado el reto Office! Selecciona qué quieres construir:</p>
+                <p class="text-sm mb-6 font-bold uppercase tracking-tight">¡Has superado el reto Office! Selecciona qué construir:</p>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <button onclick="selectBlueprint('tree')" class="p-4 bg-slate-100 hover:bg-green-100 pixel-border font-bold text-xs uppercase interactive transition-colors">🌳 Árbol</button>
-                    <button onclick="selectBlueprint('car')" class="p-4 bg-slate-100 hover:bg-blue-100 pixel-border font-bold text-xs uppercase interactive transition-colors">🚗 Auto</button>
-                    <button onclick="selectBlueprint('bench')" class="p-4 bg-slate-100 hover:bg-orange-100 pixel-border font-bold text-xs uppercase interactive transition-colors">🪑 Banco</button>
-                    <button onclick="selectBlueprint('lamp')" class="p-4 bg-slate-100 hover:bg-yellow-100 pixel-border font-bold text-xs uppercase interactive transition-colors">💡 Lámpara</button>
-                    <button onclick="selectBlueprint('flower')" class="p-4 bg-slate-100 hover:bg-pink-100 pixel-border font-bold text-xs uppercase interactive transition-colors">🌸 Flores</button>
+                    <button onclick="selectBlueprint('tree')" class="p-4 bg-slate-100 hover:bg-green-100 pixel-border font-bold text-xs uppercase interactive">🌳 Árbol</button>
+                    <button onclick="selectBlueprint('car')" class="p-4 bg-slate-100 hover:bg-blue-100 pixel-border font-bold text-xs uppercase interactive">🚗 Auto</button>
+                    <button onclick="selectBlueprint('bench')" class="p-4 bg-slate-100 hover:bg-orange-100 pixel-border font-bold text-xs uppercase interactive">🪑 Banco</button>
+                    <button onclick="selectBlueprint('lamp')" class="p-4 bg-slate-100 hover:bg-yellow-100 pixel-border font-bold text-xs uppercase interactive">💡 Lámpara</button>
+                    <button onclick="selectBlueprint('flower')" class="p-4 bg-slate-100 hover:bg-pink-100 pixel-border font-bold text-xs uppercase interactive">🌸 Flores</button>
                     <button onclick="selectBlueprint('cloud')" class="p-4 aiva-gradient text-white pixel-border font-bold text-xs uppercase animate-pulse interactive">☁️ Nube Vuelo</button>
                 </div>
             </div>
@@ -187,7 +186,7 @@
         <!-- Game Over -->
         <div id="game-over" class="hidden absolute inset-0 flex items-center justify-center bg-red-950 bg-opacity-95 z-[130] p-4 text-white text-center">
             <div class="bg-white p-8 pixel-border max-w-sm w-full interactive border-t-8 border-red-600 shadow-2xl text-black">
-                <h1 class="text-3xl font-black text-red-600 mb-2 uppercase leading-none">Energía Agotada</h1>
+                <h1 class="text-3xl font-black text-red-600 mb-2 uppercase leading-none text-pixel">Energía Agotada</h1>
                 <p class="mb-8 text-slate-600 font-bold text-sm tracking-tight">¿Necesitas recargar el sistema para completar tu villa de AIVA?</p>
                 <div class="flex flex-col gap-3">
                     <button onclick="retryContinue()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 transition-colors interactive shadow-md">RECARGAR (+40 SEG)</button>
@@ -211,7 +210,7 @@
     </div>
 
     <script>
-        // --- MOTOR CORE ---
+        // --- MOTOR Y CONFIGURACIÓN ---
         let scene, camera, renderer, player, clock, guidanceArrow;
         let treasures = [], extraObjects = [];
         let score = 0, currentLevel = 1, piecesFound = 0;
@@ -233,14 +232,14 @@
         const PROBLEMS = [
             { q: "¿Cerebro de la computadora?", a: ["CPU", "RAM", "GPU"], correct: 0 },
             { q: "¿Almacenamiento permanente?", a: ["RAM", "SSD / HDD", "Pantalla"], correct: 1 },
-            { q: "¿Memoria volátil?", a: ["USB", "CD", "Memoria RAM"], correct: 2 },
+            { q: "¿Memoria rápida que se borra al apagar?", a: ["USB", "CD", "RAM"], correct: 2 },
             { q: "¿Qué significa USB?", a: ["Universal Serial Bus", "Unit System Boot", "Ultra Bus"], correct: 0 },
             { q: "¿Periférico de entrada?", a: ["Monitor", "Mouse", "Parlantes"], correct: 1 },
             { q: "¿A cuántos bits equivale un Byte?", a: ["4", "8", "16"], correct: 1 },
             { q: "¿Qué es una LAN?", a: ["Red área local", "Una marca", "Un virus"], correct: 0 },
             { q: "¿Software principal de la PC?", a: ["Google", "Sistema Operativo", "Office"], correct: 1 },
             { q: "¿Componente para gráficos?", a: ["GPU", "Fuente", "Parlantes"], correct: 0 },
-            { q: "¿Qué significan las siglas IA?", a: ["Inteligencia Artificial", "Internet Avanzado", "Imagen Alta"], correct: 0 }
+            { q: "¿Qué significa IA?", a: ["Inteligencia Artificial", "Internet Avanzado", "Imagen Alta"], correct: 0 }
         ];
 
         const OFFICE_PROBLEMS = [
@@ -248,7 +247,7 @@
             { q: "¿Excel: con qué símbolo inicia fórmula?", a: ["+", "=", "$"], correct: 1 },
             { q: "¿Cómo se llama archivo PowerPoint?", a: ["Documento", "Hoja", "Presentación"], correct: 2 },
             { q: "¿En Excel, qué es una celda?", a: ["Dibujo", "Fila x Columna", "Letra"], correct: 1 },
-            { q: "¿Cómo se llaman hojas PowerPoint?", a: ["Diapositivas", "Páginas", "Capas"], correct: 0 },
+            { q: "¿Cómo se llaman diapositivas en PowerPoint?", a: ["Láminas", "Diapositivas", "Capas"], correct: 1 },
             { q: "¿Cuál es la extensión de Excel?", a: [".docx", ".xlsx", ".pptx"], correct: 1 },
             { q: "¿En Excel, qué función suma celdas?", a: ["=TOTAL()", "=SUMA()", "=AÑADIR()"], correct: 1 },
             { q: "¿En Word, qué es la Sangría?", a: ["Color", "Espacio al inicio", "Borrar"], correct: 1 },
@@ -392,8 +391,11 @@
             let nearest = null, minDist = Infinity;
             treasures.forEach(t => { if(!t.collected) { let d = player.position.distanceTo(t.mesh.position); if(d < minDist) { minDist = d; nearest = t; }}});
             if(nearest) {
-                guidanceArrow.visible = true; guidanceArrow.position.set(player.position.x, player.position.y + 1.8, player.position.z);
-                guidanceArrow.lookAt(nearest.mesh.position); guidanceArrow.rotateX(-Math.PI/2);
+                guidanceArrow.visible = true; 
+                guidanceArrow.position.set(player.position.x, player.position.y + 2.2, player.position.z);
+                guidanceArrow.lookAt(nearest.mesh.position); 
+                // Ajuste para que la punta del cono señale al frente
+                guidanceArrow.rotateX(Math.PI/2);
             } else guidanceArrow.visible = false;
         }
 
@@ -486,7 +488,8 @@
                     const lUI = document.getElementById('level-ui'); if(lUI) lUI.innerText = currentLevel;
                     const gT = document.getElementById('goal-text'); if(gT) gT.innerHTML = "Planos: <span id='pieces-ui'>0</span> / <span id='target-ui'>4</span>";
                     updateHouseVisual(); spawnTreasures(); startTimer(90);
-                    gameActive = true; animate(); showStatus("MUNDO EXPANDIDO", "#1e40af");
+                    gameActive = true; animate(); // REINICIAR LOOP
+                    showStatus("MUNDO EXPANDIDO", "#1e40af");
                 }
             }, 25);
         }
@@ -513,11 +516,11 @@
             const sUI = document.getElementById('style-ui'); if(sUI) sUI.innerText = currentStyle.name;
             const dUI = document.getElementById('display-name'); if(dUI) dUI.innerText = name;
             document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('stats').classList.remove('hidden');
-            document.getElementById('timer-box').classList.remove('hidden');
-            document.getElementById('btn-exit').classList.remove('hidden');
-            document.getElementById('btn-pause').classList.remove('hidden');
-            document.getElementById('btn-info').classList.remove('hidden');
+            const stats = document.getElementById('stats'); if(stats) stats.classList.remove('hidden');
+            const timerBox = document.getElementById('timer-box'); if(timerBox) timerBox.classList.remove('hidden');
+            const btnExit = document.getElementById('btn-exit'); if(btnExit) btnExit.classList.remove('hidden');
+            const btnPause = document.getElementById('btn-pause'); if(btnPause) btnPause.classList.remove('hidden');
+            const btnInfo = document.getElementById('btn-info'); if(btnInfo) btnInfo.classList.remove('hidden');
             init();
         }
 
@@ -525,12 +528,12 @@
             if (!gameActive) return; isPaused = !isPaused;
             document.getElementById('pause-screen').classList.toggle('hidden');
             const bp = document.getElementById('btn-pause');
-            bp.innerText = isPaused ? "REANUDAR" : "PAUSA";
+            if(bp) bp.innerText = isPaused ? "REANUDAR" : "PAUSA";
         }
 
         function startTimer(sec) {
             timeLeft = sec; updateTimerDisplay(); clearInterval(timerInterval);
-            timerInterval = setInterval(() => { if(!gameActive || activeTreasure || isPaused || isPlacing) return; timeLeft--; updateTimerDisplay(); if(timeLeft <= 0) { gameActive = false; clearInterval(timerInterval); document.getElementById('game-over').classList.remove('hidden'); }}, 1000);
+            timerInterval = setInterval(() => { if(!gameActive || activeTreasure || isPaused || isPlacing) return; timeLeft--; updateTimerDisplay(); if(timeLeft <= 0) { gameActive = false; clearInterval(timerInterval); const go = document.getElementById('game-over'); if(go) go.classList.remove('hidden'); }}, 1000);
         }
 
         function updateTimerDisplay() {
@@ -538,7 +541,14 @@
             const b = document.getElementById('timer-box'); if(b) { if(timeLeft < 10) b.classList.add('timer-warning'); else b.classList.remove('timer-warning'); }
         }
 
-        function retryContinue() { document.getElementById('game-over').classList.add('hidden'); gameActive = true; startTimer(40); animate(); showStatus("RECARGADO", "#2563eb"); }
+        function retryContinue() { 
+            const go = document.getElementById('game-over'); if(go) go.classList.add('hidden'); 
+            gameActive = true; 
+            if(clock) clock.getDelta(); 
+            startTimer(40); 
+            animate(); 
+            showStatus("RECARGADO", "#2563eb"); 
+        }
         
         function downloadWallpaper() {
             const nInput = document.getElementById('player-name');
@@ -555,17 +565,17 @@
             cx.textAlign = 'left'; cx.shadowColor = "black"; cx.shadowBlur = 5;
             cx.fillStyle = '#60a5fa'; cx.font = 'bold 24px Arial'; cx.fillText("PROYECTO: AIVA ACADEMIA", 70, 830);
             cx.fillStyle = '#ffffff'; cx.font = 'black 80px Arial'; cx.fillText(name, 70, 910);
-            cx.font = 'bold 36px Arial'; cx.fillStyle = '#ffd700'; cx.fillText(`AIVA CONSTRUCTOR | NIVEL: ${currentLevel}`, 70, 960);
+            cx.font = 'bold 36px Arial'; cx.fillStyle = '#ffd700'; cx.fillText(`MAESTRO CONSTRUCTOR | NIVEL: ${currentLevel}`, 70, 960);
             cx.font = 'bold 42px Arial'; cx.fillStyle = '#4ade80'; cx.fillText(`PUNTAJE LOGRADO: ${score}`, 70, 1010);
             const link = document.createElement('a'); link.download = `AIVA_Voxel_Quest_${name}.jpg`; link.href = cv.toDataURL('image/jpeg', 0.95); link.click(); tr.dispose();
         }
 
-        function showInstructions() { document.getElementById('instructions-modal').classList.remove('hidden'); }
-        function hideInstructions() { document.getElementById('instructions-modal').classList.add('hidden'); }
-        function showExitConfirm() { isPaused = true; document.getElementById('exit-confirm-modal').classList.remove('hidden'); }
-        function hideExitConfirm() { isPaused = false; document.getElementById('exit-confirm-modal').classList.add('hidden'); }
+        function showInstructions() { const mod = document.getElementById('instructions-modal'); if(mod) mod.classList.remove('hidden'); }
+        function hideInstructions() { const mod = document.getElementById('instructions-modal'); if(mod) mod.classList.add('hidden'); }
+        function showExitConfirm() { isPaused = true; const mod = document.getElementById('exit-confirm-modal'); if(mod) mod.classList.remove('hidden'); }
+        function hideExitConfirm() { isPaused = false; const mod = document.getElementById('exit-confirm-modal'); if(mod) mod.classList.add('hidden'); }
         function confirmExit() { location.reload(); }
-        function showStatus(t, c) { const m = document.getElementById('status-msg'); m.innerText = t; m.style.backgroundColor = c; m.classList.remove('hidden'); setTimeout(() => m.classList.add('hidden'), 3000); }
+        function showStatus(t, c) { const m = document.getElementById('status-msg'); if(m) { m.innerText = t; m.style.backgroundColor = c; m.classList.remove('hidden'); setTimeout(() => m.classList.add('hidden'), 3000); } }
 
         function createHousePart(l, s) {
             const g = new THREE.Group(); const c = s.colors;
