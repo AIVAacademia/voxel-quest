@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIVA Voxel Quest - Constructor Tecnológico</title>
+    <!-- Librería 3D Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Tailwind CSS para Interfaz Moderna -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; }
+        canvas { display: block; }
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        .interactive { pointer-events: auto; }
+        .pixel-border {
+            image-rendering: pixelated;
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0px #1e293b;
+        }
+        @keyframes pulse-red {
+            0%, 100% { color: white; }
+            50% { color: #ff4444; }
+        }
+        .timer-warning { animation: pulse-red 0.5s infinite; }
+        .gold-glow { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); border-color: #ffd700; }
+        .hint-anim { animation: bounce 2s infinite; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .aiva-gradient {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de Inicio -->
+    <div id="start-screen" class="absolute inset-0 flex items-center justify-center bg-slate-900 z-50 p-4">
+        <div class="bg-white p-8 rounded-none pixel-border max-w-md w-full text-center">
+            <div class="mb-2">
+                <span class="text-blue-600 font-bold text-xs tracking-[0.3em] uppercase">AIVA Academia</span>
+            </div>
+            <h1 class="text-4xl font-black mb-2 text-blue-800 uppercase leading-none">VOXEL QUEST</h1>
+            <p class="text-xs font-bold text-orange-500 mb-6 border-y-2 border-orange-100 py-1 uppercase tracking-widest">Constructor Tecnológico</p>
+            
+            <input type="text" id="player-name" placeholder="Escribe tu nombre de explorador..." 
+                class="w-full p-3 border-4 border-black mb-6 focus:outline-none focus:border-blue-500 font-bold text-center uppercase">
+            
+            <div class="flex flex-col gap-3">
+                <button onclick="startGame()" class="w-full aiva-gradient hover:opacity-90 text-white font-bold py-4 px-6 pixel-border transition-transform active:scale-95 shadow-lg">
+                    ¡INICIAR MISIÓN!
+                </button>
+                <button onclick="showInstructions()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-6 pixel-border text-sm">
+                    📜 CÓMO JUGAR
+                </button>
+            </div>
+            <p class="mt-6 text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Powered by AIVA Education Engine</p>
+        </div>
+    </div>
+
+    <!-- Modal de Instrucciones -->
+    <div id="instructions-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-[70] p-4">
+        <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-blue-600">
+            <h2 class="text-2xl font-bold text-blue-700 mb-4 uppercase text-center tracking-tighter">Manual de AIVA Explorer</h2>
+            <div class="h-64 overflow-y-auto pr-2 custom-scrollbar text-sm space-y-4">
+                <section class="bg-slate-50 p-3 border-l-4 border-blue-500">
+                    <h3 class="font-bold text-blue-600 uppercase mb-1">🕹️ Caminar</h3>
+                    <p>Usa las <b>Teclas WASD</b> o las <b>Flechas</b> para explorar la isla.</p>
+                </section>
+                <section class="bg-slate-50 p-3 border-l-4 border-orange-500">
+                    <h3 class="font-bold text-orange-500 uppercase mb-1">🎥 Vista (Nivel 5+)</h3>
+                    <p><b>Rueda del Mouse:</b> Zoom.<br><b>Teclas Q / E:</b> Cambia la altura de la cámara.</p>
+                </section>
+                <section class="bg-slate-50 p-3 border-l-4 border-green-500">
+                    <h3 class="font-bold text-green-500 uppercase mb-1">🔨 Construir (Nivel 10+)</h3>
+                    <p>Al ganar un plano, podrás elegir el lugar:<br>
+                    <b>WASD:</b> Posiciona el objeto.<br>
+                    <b>Teclas 1 / 2:</b> Rota el objeto.<br>
+                    <b>ESPACIO:</b> Construir definitivamente.</p>
+                </section>
+                <section class="bg-slate-50 p-3 border-l-4 border-purple-500">
+                    <h3 class="font-bold text-purple-500 uppercase mb-1">🚀 Vuelo (Nivel 15+)</h3>
+                    <p><b>Tecla R:</b> Subir.<br><b>Tecla F:</b> Bajar.</p>
+                </section>
+                <section class="bg-blue-100 p-3">
+                    <h3 class="font-bold text-blue-800 uppercase mb-1">🎯 Tu Misión</h3>
+                    <p>Recupera las piezas de hardware para construir la casa de tus sueños. Responde correctamente las preguntas antes de que el tiempo se agote.</p>
+                </section>
+            </div>
+            <button onclick="hideInstructions()" class="w-full mt-6 bg-blue-600 text-white font-bold py-3 px-6 pixel-border transition-colors">
+                ¡ESTOY LISTO!
+            </button>
+        </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="ui-layer">
+        <div class="flex justify-between p-4 items-start">
+            <div id="stats" class="bg-white p-3 pixel-border hidden pointer-events-auto">
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                    <p class="font-bold text-xs text-blue-600 uppercase tracking-tighter"><span id="display-name">-</span> | AIVA STUDENT</p>
+                </div>
+                <div class="grid grid-cols-2 gap-x-4 mt-2">
+                    <p class="font-bold text-xs uppercase text-gray-500">Nivel: <span id="level-ui" class="text-purple-600 text-sm font-black">1</span></p>
+                    <p class="font-bold text-xs uppercase text-gray-500">Score: <span id="score-ui" class="text-green-600 text-sm font-black">0</span></p>
+                    <p class="font-bold text-xs uppercase text-gray-500 col-span-2 mt-1" id="goal-text">Objetivo: <span id="pieces-ui" class="text-orange-500 text-sm">0</span>/<span id="target-ui">3</span></p>
+                </div>
+                <p class="text-[9px] font-bold mt-2 text-slate-300 tracking-[0.2em] uppercase border-t pt-1">ESTILO: <span id="style-ui">NORMAL</span></p>
+            </div>
+
+            <div class="flex flex-col gap-2 items-end pointer-events-auto">
+                <div id="timer-box" class="bg-black text-white p-3 pixel-border hidden min-w-[120px] text-center border-blue-500">
+                    <p class="text-[10px] uppercase font-bold text-blue-400">Energía de Tiempo</p>
+                    <p id="timer-ui" class="text-2xl font-black tracking-widest font-mono">00:60</p>
+                </div>
+                
+                <div class="flex gap-2">
+                    <button onclick="togglePause()" id="btn-pause" class="hidden bg-yellow-500 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-yellow-600 transition-colors">
+                        PAUSA
+                    </button>
+                    <button onclick="showExitConfirm()" class="bg-red-500 text-white p-2 pixel-border font-bold text-xs hover:bg-red-600 hidden" id="btn-exit">
+                        SALIR
+                    </button>
+                </div>
+
+                <!-- Hints -->
+                <div id="camera-hint" class="hidden bg-blue-500 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim">
+                    CÁMARA: RUEDA (ZOOM) | Q-E (ALTURA)
+                </div>
+                <div id="build-hint" class="hidden bg-green-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim">
+                    CONSTRUCCIÓN: ESPACIO (PONER) | 1-2 (GIRAR)
+                </div>
+                <div id="flight-hint" class="hidden bg-purple-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim">
+                    VUELO DESBLOQUEADO: R (SUBIR) | F (BAJAR)
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Modal -->
+        <div id="quiz-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 p-4 z-40">
+            <div class="bg-white p-6 pixel-border max-w-sm w-full interactive text-center border-t-8 border-blue-600">
+                <p class="text-[10px] font-black text-blue-600 uppercase mb-2">Desafío Técnico AIVA</p>
+                <p id="quiz-question" class="mb-8 text-lg font-bold leading-tight text-slate-800">...</p>
+                <div id="quiz-options" class="grid grid-cols-1 gap-3"></div>
+            </div>
+        </div>
+
+        <!-- Pausa -->
+        <div id="pause-screen" class="hidden fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-90 z-50 p-4">
+            <div class="bg-white p-8 pixel-border text-center max-w-sm w-full interactive">
+                <h1 class="text-3xl font-black text-blue-700 mb-4 uppercase">Misión Pausada</h1>
+                <p class="mb-8 text-slate-500 font-bold">¡Recupera energías para seguir construyendo!</p>
+                <button onclick="togglePause()" class="w-full aiva-gradient text-white font-bold py-4 px-6 pixel-border hover:opacity-90">
+                    VOLVER A LA ISLA
+                </button>
+            </div>
+        </div>
+
+        <!-- Confirmación de Salida -->
+        <div id="exit-confirm-modal" class="hidden fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-95 z-[60] p-4">
+            <div class="bg-white p-8 pixel-border text-center max-w-md w-full interactive border-t-8 border-red-500">
+                <h1 class="text-2xl font-black text-red-600 mb-2 uppercase">¿Abandonar Misión?</h1>
+                <p class="mb-8 text-slate-600 font-bold">Guarda una foto de tus logros en AIVA Academia antes de salir.</p>
+                <div class="flex flex-col gap-3">
+                    <button onclick="downloadWallpaper()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 flex items-center justify-center gap-2">
+                        💾 DESCARGAR FOTO DE MI CASA
+                    </button>
+                    <div class="h-px bg-slate-200 my-4"></div>
+                    <button onclick="hideExitConfirm()" class="w-full bg-green-500 text-white font-bold py-3 px-6 pixel-border hover:bg-green-600">
+                        CONTINUAR JUGANDO
+                    </button>
+                    <button onclick="confirmExit()" class="w-full text-slate-400 font-bold py-2 px-6 text-xs hover:text-red-500 uppercase italic">
+                        Salir sin guardar nada
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Victoria y Expansión -->
+        <div id="victory-screen" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-95 z-50 p-4 text-white">
+            <div class="bg-white text-black p-8 pixel-border text-center max-w-lg w-full interactive border-t-8 border-blue-500">
+                <h1 class="text-4xl font-black text-blue-800 mb-2 uppercase italic tracking-tighter">¡CASA BASE LISTA!</h1>
+                <p class="text-md mb-8 text-slate-600 font-bold">Has demostrado tu maestría técnica. Ahora desbloquearemos la expansión de la villa.</p>
+                <div class="grid grid-cols-1 gap-4">
+                    <button onclick="continueToExpansion()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 px-6 pixel-border text-xl animate-pulse uppercase">
+                        EXPANDIR EL MUNDO 🌍
+                    </button>
+                    <button onclick="downloadWallpaper()" class="bg-blue-100 text-blue-700 font-bold py-3 px-6 pixel-border text-xs uppercase">
+                        Descargar fondo de pantalla
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Logrado -->
+        <div id="level-complete" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-50 p-4">
+            <div class="text-center text-white">
+                <h1 class="text-6xl font-black mb-4 italic tracking-tighter text-blue-300">¡NIVEL LOGRADO!</h1>
+                <p class="text-xl mb-10 font-bold uppercase tracking-widest" id="construction-update">Actualizando Arquitectura...</p>
+                <div class="w-80 bg-slate-800 h-6 pixel-border mx-auto overflow-hidden">
+                    <div id="level-progress" class="bg-blue-400 h-full transition-all duration-1000" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over -->
+        <div id="game-over" class="hidden absolute inset-0 flex items-center justify-center bg-red-950 bg-opacity-95 z-50 p-4 text-white">
+            <div class="bg-white p-8 pixel-border text-center max-w-sm text-black border-t-8 border-red-600">
+                <h1 class="text-3xl font-black text-red-600 mb-2 uppercase leading-none">Energía Agotada</h1>
+                <p class="mb-8 text-slate-600 font-bold text-sm leading-tight">¿Necesitas más tiempo para completar tu construcción de AIVA?</p>
+                <div class="flex flex-col gap-3">
+                    <button onclick="retryContinue()" class="bg-blue-600 text-white font-bold py-4 px-6 pixel-border w-full hover:bg-blue-700">
+                        RECARGAR (+40 SEG)
+                    </button>
+                    <button onclick="downloadWallpaper()" class="bg-slate-100 text-slate-700 font-bold py-3 px-6 pixel-border w-full text-xs">
+                        Descargar mi avance
+                    </button>
+                    <button onclick="confirmExit()" class="w-full text-slate-400 py-2 text-[10px] uppercase">Reiniciar partida</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="status-msg" class="hidden absolute top-28 left-1/2 transform -translate-x-1/2 aiva-gradient text-white p-2 pixel-border font-bold text-[10px] z-30 uppercase tracking-widest shadow-xl border-white border-opacity-20">
+            MENSAJE
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTES Y ESTADOS ---
+        let scene, camera, renderer, player, clock;
+        let treasures = [], extraObjects = [];
+        let score = 0, currentLevel = 1, piecesFound = 0;
+        let timeLeft = 60, timerInterval;
+        let keys = { w: false, a: false, s: false, d: false, q: false, e: false, r: false, f: false, space: false, 1: false, 2: false };
+        let activeTreasure = null, gameActive = false, isExpansionMode = false, isPaused = false;
+        let houseGroup, currentStyle, islandGroup;
+        let islandRadius = 14;
+
+        let isPlacing = false, ghostObject = null, currentBlueprintType = null;
+        let camDistance = 12, camHeight = 10;
+
+        const HOUSE_STYLES = [
+            { name: "CIUDAD AIVA", colors: { stone: 0x888888, wood: 0x8b4513, wall: 0xeeeeee, roof: 0x2563eb, glass: 0xbfdbfe, car: 0x1e40af, leaf: 0x16a34a, flower: 0xec4899 } },
+            { name: "LABORATORIO", colors: { stone: 0x334155, wood: 0x1e293b, wall: 0x94a3b8, roof: 0x0ea5e9, glass: 0xffffff, car: 0x64748b, leaf: 0x22c55e, flower: 0xef4444 } },
+            { name: "VILLA TECH", colors: { stone: 0x555555, wood: 0x5d4037, wall: 0xd1d5db, roof: 0x059669, glass: 0x93c5fd, car: 0x475569, leaf: 0x064e3b, flower: 0xfde047 } }
+        ];
+
+        const PROBLEMS = [
+            { q: "¿Cuál es el cerebro de la computadora?", a: ["CPU", "RAM", "GPU"], correct: 0 },
+            { q: "¿Dónde se guardan los archivos de forma permanente?", a: ["RAM", "Disco Duro (HDD/SSD)", "Monitor"], correct: 1 },
+            { q: "¿Qué memoria es rápida pero volátil (se borra al apagar)?", a: ["CD", "USB", "Memoria RAM"], correct: 2 },
+            { q: "¿Qué significan las siglas USB?", a: ["Universal Serial Bus", "Unit System Boot", "Ultra Speed Bus"], correct: 0 },
+            { q: "¿Cuál es un periférico de entrada?", a: ["Monitor", "Mouse", "Parlantes"], correct: 1 },
+            { q: "¿Qué placa conecta todos los componentes?", a: ["Motherboard", "BIOS", "Socket"], correct: 0 },
+            { q: "¿A cuántos bits equivale un Byte?", a: ["4", "8", "16"], correct: 1 },
+            { q: "¿Qué dispositivo da internet inalámbrico?", a: ["Scanner", "Router Wi-Fi", "Webcam"], correct: 1 },
+            { q: "¿Cuál es una red de área local?", a: ["LAN", "WAN", "PAN"], correct: 0 },
+            { q: "¿Qué cable conecta internet cableado?", a: ["HDMI", "Ethernet", "VGA"], correct: 1 },
+            { q: "¿Cuál es un periférico de salida?", a: ["Micrófono", "Monitor", "Teclado"], correct: 1 },
+            { q: "¿Software que maneja toda la computadora?", a: ["Chrome", "Sistema Operativo", "Antivirus"], correct: 1 },
+            { q: "¿Qué programa protege contra malware?", a: ["Paint", "Word", "Antivirus"], correct: 2 },
+            { q: "¿Cuál es un navegador web?", a: ["Google Chrome", "PowerPoint", "Excel"], correct: 0 },
+            { q: "¿Qué extensión suele ser una imagen?", a: [".docx", ".exe", ".png"], correct: 2 },
+            { q: "¿Qué componente procesa los gráficos?", a: ["GPU", "Tarjeta Sonido", "Fuente"], correct: 0 },
+            { q: "¿Qué unidad da energía a la PC?", a: ["Batería", "Fuente de Poder", "Bocinas"], correct: 1 },
+            { q: "¿Qué pieza enfría al procesador?", a: ["Ventilador/Disipador", "Teclado", "Carcasa"], correct: 0 },
+            { q: "¿Qué significa WWW?", a: ["World Wide Web", "Wide Web World", "Web World Wide"], correct: 0 },
+            { q: "¿Qué es un píxel?", a: ["Mínimo punto de color", "Un cable", "Un virus"], correct: 0 },
+            { q: "¿Qué significan las siglas IA?", a: ["Inteligencia Artificial", "Internet Avanzado", "Imagen Automática"], correct: 0 },
+            { q: "¿Cuál es una red social?", a: ["Wikipedia", "Facebook", "Google Search"], correct: 1 },
+            { q: "¿Qué programa es para hojas de cálculo?", a: ["Word", "Excel", "Outlook"], correct: 1 },
+            { q: "¿Qué es la 'Nube' (Cloud)?", a: ["Un clima", "Servidores en internet", "Un virus"], correct: 1 },
+            { q: "¿Qué programa sirve para presentaciones?", a: ["PowerPoint", "Notepad", "Calculator"], correct: 0 },
+            { q: "¿Qué significa HTML?", a: ["HyperText Markup Language", "Home Tool Main", "High Text Link"], correct: 0 },
+            { q: "¿Qué es hardware?", a: ["La parte física", "Los programas", "Los archivos"], correct: 0 },
+            { q: "¿Qué es software?", a: ["Las piezas", "Los programas", "El cable"], correct: 1 },
+            { q: "¿Para qué sirve el puerto HDMI?", a: ["Video y Audio", "Carga", "Ratón"], correct: 0 },
+            { q: "¿Qué significa PDF?", a: ["Portable Document Format", "Public File", "Personal Data"], correct: 0 },
+            { q: "¿Cuál es el almacenamiento más veloz?", a: ["Disco HDD", "Unidad SSD", "Cinta"], correct: 1 },
+            { q: "¿Qué tecla se usa para salir?", a: ["Space", "Esc", "Enter"], correct: 1 },
+            { q: "¿Qué es un algoritmo?", a: ["Pasos para resolver algo", "Un monitor", "Un virus"], correct: 0 }
+        ];
+
+        // --- MOTOR CORE ---
+        function init() {
+            if (renderer) {
+                renderer.dispose();
+                if(renderer.domElement.parentNode) document.body.removeChild(renderer.domElement);
+            }
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xdbeafe);
+            scene.fog = new THREE.Fog(0xdbeafe, 15, 65);
+            
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 0.7));
+            const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+            sun.position.set(10, 30, 20);
+            scene.add(sun);
+
+            islandGroup = new THREE.Group();
+            scene.add(islandGroup);
+            createIsland(islandRadius);
+
+            houseGroup = new THREE.Group();
+            scene.add(houseGroup);
+            updateHouseVisual();
+
+            player = new THREE.Group();
+            player.add(new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.0, 0.4), new THREE.MeshLambertMaterial({color: 0x2563eb}))); // Azul AIVA
+            player.position.set(0, 0.5, 6);
+            scene.add(player);
+
+            spawnTreasures();
+            startTimer(60);
+            clock = new THREE.Clock();
+            
+            setupEvents();
+            gameActive = true;
+            animate();
+        }
+
+        function setupEvents() {
+            window.onkeydown = (e) => {
+                const k = e.key.toLowerCase();
+                if(['w','s','a','d','arrowup','arrowdown','arrowleft','arrowright','q','e','r','f',' ','1','2'].includes(k)) {
+                    if(k === ' ') { e.preventDefault(); if(isPlacing) placeObject(); }
+                    if(k.includes('arrow')) {
+                        if(k==='arrowup') keys.w = true; if(k==='arrowdown') keys.s = true;
+                        if(k==='arrowleft') keys.a = true; if(k==='arrowright') keys.d = true;
+                    } else keys[k] = true;
+                    
+                    if(isPlacing) {
+                        if(k === '1') ghostObject.rotation.y += Math.PI/8;
+                        if(k === '2') ghostObject.rotation.y -= Math.PI/8;
+                    }
+                }
+            };
+            window.onkeyup = (e) => {
+                const k = e.key.toLowerCase();
+                if(k.includes('arrow')) {
+                    if(k==='arrowup') keys.w = false; if(k==='arrowdown') keys.s = false;
+                    if(k==='arrowleft') keys.a = false; if(k==='arrowright') keys.d = false;
+                } else keys[k] = false;
+            };
+            window.onwheel = (e) => {
+                if (currentLevel >= 5 && !isPaused) {
+                    camDistance += e.deltaY * 0.01;
+                    camDistance = Math.max(5, Math.min(40, camDistance));
+                }
+            };
+            window.onresize = () => {
+                if (camera) { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); }
+                if (renderer) renderer.setSize(window.innerWidth, window.innerHeight);
+            };
+        }
+
+        function createIsland(radius) {
+            islandGroup.clear();
+            const geo = new THREE.BoxGeometry(1, 1, 1);
+            for(let x = -Math.floor(radius+2); x < radius+2; x++) {
+                for(let z = -Math.floor(radius+2); z < radius+2; z++) {
+                    const d = Math.sqrt(x*x + z*z);
+                    if(d < radius) {
+                        const mat = new THREE.MeshLambertMaterial({color: d > radius-2 ? 0xddccaa : 0x4ade80});
+                        const b = new THREE.Mesh(geo, mat);
+                        b.position.set(x, d > radius-2 ? -0.2 : -0.5, z);
+                        islandGroup.add(b);
+                    }
+                }
+            }
+        }
+
+        function updateHouseVisual() {
+            houseGroup.clear();
+            for(let i=1; i < currentLevel; i++) {
+                if(i <= 10) houseGroup.add(createHousePart(i, currentStyle));
+            }
+            const cHint = document.getElementById('camera-hint');
+            if(cHint && currentLevel >= 5) cHint.classList.remove('hidden');
+            const fHint = document.getElementById('flight-hint');
+            if(fHint && currentLevel >= 15) fHint.classList.remove('hidden');
+        }
+
+        function spawnTreasures() {
+            treasures.forEach(t => scene.remove(t.mesh));
+            treasures = [];
+            piecesFound = 0;
+            const target = isExpansionMode ? 4 : Math.min(currentLevel + 2, 8);
+            
+            const targetUI = document.getElementById('target-ui');
+            const piecesUI = document.getElementById('pieces-ui');
+            if(targetUI) targetUI.innerText = target;
+            if(piecesUI) piecesUI.innerText = 0;
+
+            for(let i = 0; i < target; i++) {
+                const colors = [0x2563eb, 0x1e293b, 0x059669];
+                const model = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.7), new THREE.MeshLambertMaterial({color: colors[i%3]}));
+                const limit = islandRadius - 4;
+                const x = (Math.random() - 0.5) * limit * 2, z = (Math.random() - 0.5) * limit * 2;
+                let y = 0.6;
+                if(currentLevel >= 15) y = Math.random() * 9 + 1; 
+
+                if(Math.abs(x) < 5 && Math.abs(z) < 5 && y < 5) { i--; continue; }
+                
+                model.position.set(Math.round(x), y, Math.round(z));
+                scene.add(model);
+                treasures.push({ mesh: model, collected: false });
+            }
+        }
+
+        function animate() {
+            if(!gameActive) return;
+            requestAnimationFrame(animate);
+            
+            if (!isPaused) {
+                const delta = clock.getDelta();
+                if(!activeTreasure && !isPlacing) {
+                    const speed = 9 * delta;
+                    if(keys.w) { player.position.z -= speed; player.rotation.y = Math.PI; }
+                    if(keys.s) { player.position.z += speed; player.rotation.y = 0; }
+                    if(keys.a) { player.position.x -= speed; player.rotation.y = -Math.PI/2; }
+                    if(keys.d) { player.position.x += speed; player.rotation.y = Math.PI/2; }
+                    
+                    if (currentLevel >= 15) {
+                        if (keys.r) player.position.y += speed;
+                        if (keys.f) player.position.y -= speed;
+                        player.position.y = Math.max(0.5, Math.min(15, player.position.y));
+                    } else player.position.y = 0.5;
+
+                    if (currentLevel >= 5) {
+                        if (keys.q) camHeight += 7 * delta;
+                        if (keys.e) camHeight -= 7 * delta;
+                        camHeight = Math.max(2, Math.min(30, camHeight));
+                    }
+
+                    const distH = Math.sqrt(player.position.x**2 + player.position.z**2);
+                    if(distH < 3.8 && player.position.y < 4.5) player.position.multiplyScalar(1.1);
+
+                    const targetCamPos = new THREE.Vector3(player.position.x, player.position.y + camHeight, player.position.z + camDistance);
+                    camera.position.lerp(targetCamPos, 0.1);
+                    camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
+                    
+                    checkCollisions();
+                }
+
+                if(isPlacing && ghostObject) {
+                    ghostObject.position.set(player.position.x, player.position.y, player.position.z);
+                    camera.lookAt(player.position.x, player.position.y, player.position.z);
+                }
+                treasures.forEach(t => { if(!t.collected) t.mesh.rotation.y += 0.06; });
+            } else clock.getDelta(); 
+            renderer.render(scene, camera);
+        }
+
+        function checkCollisions() {
+            treasures.forEach(t => {
+                if(!t.collected && player.position.distanceTo(t.mesh.position) < 1.4) triggerQuiz(t);
+            });
+        }
+
+        function triggerQuiz(treasure) {
+            activeTreasure = treasure;
+            const p = PROBLEMS[Math.floor(Math.random() * PROBLEMS.length)];
+            const qEl = document.getElementById('quiz-question');
+            const optEl = document.getElementById('quiz-options');
+            const modEl = document.getElementById('quiz-modal');
+            if(!qEl || !optEl || !modEl) return;
+
+            qEl.innerText = p.q;
+            optEl.innerHTML = '';
+            p.a.forEach((opt, i) => {
+                const b = document.createElement('button');
+                b.className = "w-full bg-slate-50 hover:bg-blue-50 p-3 pixel-border text-left font-bold transition-all transform active:scale-95 text-slate-700";
+                b.innerText = `${String.fromCharCode(65+i)}. ${opt}`;
+                b.onclick = () => checkAnswer(i, p.correct);
+                optEl.appendChild(b);
+            });
+            modEl.classList.remove('hidden');
+        }
+
+        function checkAnswer(sel, cor) {
+            const modal = document.getElementById('quiz-modal');
+            if(modal) modal.classList.add('hidden');
+            
+            if(sel === cor) {
+                activeTreasure.collected = true;
+                scene.remove(activeTreasure.mesh);
+                piecesFound++;
+                score += 250 + (timeLeft * 3);
+                
+                const pUI = document.getElementById('pieces-ui');
+                const sUI = document.getElementById('score-ui');
+                if(pUI) pUI.innerText = piecesFound;
+                if(sUI) sUI.innerText = score;
+                
+                if(isExpansionMode) enterPlacingMode();
+                else if(piecesFound >= Math.min(currentLevel + 2, 8)) nextLevel();
+            } else {
+                timeLeft = Math.max(0, timeLeft - 10);
+                player.position.x += (Math.random()-0.5)*6;
+                updateTimerDisplay();
+                showStatus("¡ ERROR DE SISTEMA ! -10 SEG", "#f87171");
+            }
+            activeTreasure = null;
+        }
+
+        function enterPlacingMode() {
+            isPlacing = true;
+            const types = ['tree', 'car', 'bench', 'lamp', 'flower'];
+            currentBlueprintType = types[Math.floor(Math.random() * types.length)];
+            ghostObject = createBlueprint(currentBlueprintType, currentStyle);
+            ghostObject.traverse(n => { if(n.isMesh) { n.material = n.material.clone(); n.material.transparent = true; n.material.opacity = 0.6; }});
+            scene.add(ghostObject);
+            const hint = document.getElementById('build-hint');
+            if(hint) hint.classList.remove('hidden');
+            showStatus("MODO ARQUITECTO: ELIGE POSICIÓN", "#3b82f6");
+        }
+
+        function placeObject() {
+            const finalObj = createBlueprint(currentBlueprintType, currentStyle);
+            finalObj.position.copy(ghostObject.position);
+            finalObj.rotation.copy(ghostObject.rotation);
+            scene.add(finalObj);
+            extraObjects.push(finalObj);
+            scene.remove(ghostObject);
+            ghostObject = null;
+            isPlacing = false;
+            const hint = document.getElementById('build-hint');
+            if(hint) hint.classList.add('hidden');
+            if(piecesFound >= 4) { currentLevel++; nextLevelExpansion(); }
+        }
+
+        function nextLevel() {
+            gameActive = false;
+            if(currentLevel === 10) {
+                const vs = document.getElementById('victory-screen');
+                if(vs) vs.classList.remove('hidden');
+                return;
+            }
+            const screen = document.getElementById('level-complete');
+            const uText = document.getElementById('construction-update');
+            if(uText) uText.innerText = "Fase " + currentLevel + " completada";
+            if(screen) screen.classList.remove('hidden');
+            
+            setTimeout(() => {
+                const prog = document.getElementById('level-progress');
+                if(prog) prog.style.width = "100%";
+                setTimeout(() => {
+                    currentLevel++;
+                    updateHouseVisual();
+                    spawnTreasures();
+                    startTimer(60);
+                    if(screen) screen.classList.add('hidden');
+                    if(prog) prog.style.width = "0%";
+                    const lUI = document.getElementById('level-ui');
+                    if(lUI) lUI.innerText = currentLevel;
+                    gameActive = true; animate();
+                }, 1000);
+            }, 100);
+        }
+
+        function continueToExpansion() {
+            isExpansionMode = true;
+            const vs = document.getElementById('victory-screen');
+            if(vs) vs.classList.add('hidden');
+            const interval = setInterval(() => {
+                islandRadius += 0.5;
+                createIsland(islandRadius);
+                if(islandRadius >= 38) {
+                    clearInterval(interval);
+                    const lUI = document.getElementById('level-ui');
+                    if(lUI) lUI.innerText = currentLevel;
+                    const gText = document.getElementById('goal-text');
+                    if(gText) gText.innerHTML = "Planos: <span id='pieces-ui' class='text-orange-500'>0</span> / <span id='target-ui'>4</span>";
+                    updateHouseVisual();
+                    spawnTreasures();
+                    startTimer(90);
+                    gameActive = true; animate();
+                    showStatus("¡ MUNDO AIVA EXPANDIDO !", "#1e40af");
+                }
+            }, 25);
+        }
+
+        function nextLevelExpansion() {
+            gameActive = false;
+            const screen = document.getElementById('level-complete');
+            if(screen) screen.classList.remove('hidden');
+            setTimeout(() => {
+                const prog = document.getElementById('level-progress');
+                if(prog) prog.style.width = "100%";
+                setTimeout(() => {
+                    spawnTreasures();
+                    startTimer(90);
+                    if(screen) screen.classList.add('hidden');
+                    if(prog) prog.style.width = "0%";
+                    const lUI = document.getElementById('level-ui');
+                    if(lUI) lUI.innerText = currentLevel;
+                    gameActive = true; animate();
+                }, 1000);
+            }, 100);
+        }
+
+        function startGame() {
+            const nInput = document.getElementById('player-name');
+            const name = nInput ? nInput.value : "";
+            if(!name) return alert("Por favor, ingresa tu nombre de explorador.");
+            
+            currentStyle = HOUSE_STYLES[Math.floor(Math.random() * HOUSE_STYLES.length)];
+            const sUI = document.getElementById('style-ui');
+            const nUI = document.getElementById('display-name');
+            if(sUI) sUI.innerText = currentStyle.name;
+            if(nUI) nUI.innerText = name;
+            
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('stats').classList.remove('hidden');
+            document.getElementById('timer-box').classList.remove('hidden');
+            document.getElementById('btn-exit').classList.remove('hidden');
+            document.getElementById('btn-pause').classList.remove('hidden');
+            
+            init();
+        }
+
+        function togglePause() {
+            if (!gameActive) return;
+            isPaused = !isPaused;
+            const ps = document.getElementById('pause-screen');
+            const bp = document.getElementById('btn-pause');
+            if (isPaused) {
+                if(ps) ps.classList.remove('hidden');
+                if(bp) { bp.innerText = "REANUDAR"; bp.classList.replace('bg-yellow-500','bg-green-600'); }
+            } else {
+                if(ps) ps.classList.add('hidden');
+                if(bp) { bp.innerText = "PAUSA"; bp.classList.replace('bg-green-600','bg-yellow-500'); }
+            }
+        }
+
+        function showInstructions() { document.getElementById('instructions-modal').classList.remove('hidden'); }
+        function hideInstructions() { document.getElementById('instructions-modal').classList.add('hidden'); }
+        function showExitConfirm() { isPaused = true; document.getElementById('exit-confirm-modal').classList.remove('hidden'); }
+        function hideExitConfirm() { isPaused = false; document.getElementById('exit-confirm-modal').classList.add('hidden'); }
+        function confirmExit() { location.reload(); }
+
+        function startTimer(sec) {
+            timeLeft = sec;
+            updateTimerDisplay();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if(!gameActive || activeTreasure || isPaused || isPlacing) return;
+                timeLeft--;
+                updateTimerDisplay();
+                if(timeLeft <= 0) { 
+                    gameActive = false; 
+                    clearInterval(timerInterval); 
+                    const go = document.getElementById('game-over');
+                    if(go) go.classList.remove('hidden'); 
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const tUI = document.getElementById('timer-ui');
+            if(tUI) tUI.innerText = `00:${timeLeft < 10 ? '0'+timeLeft : timeLeft}`;
+            const b = document.getElementById('timer-box');
+            if(b) {
+                if(timeLeft < 10) b.classList.add('timer-warning'); else b.classList.remove('timer-warning');
+            }
+        }
+
+        function retryContinue() {
+            document.getElementById('game-over').classList.add('hidden');
+            gameActive = true;
+            startTimer(40); 
+            animate();
+        }
+
+        function showStatus(txt, col) {
+            const m = document.getElementById('status-msg');
+            if(!m) return;
+            m.innerText = txt;
+            m.style.backgroundColor = col;
+            m.classList.remove('hidden');
+            setTimeout(() => m.classList.add('hidden'), 3500);
+        }
+
+        function downloadWallpaper() {
+            const nInput = document.getElementById('player-name');
+            const name = (nInput && nInput.value ? nInput.value : "Explorador").toUpperCase();
+            
+            const tRenderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            tRenderer.setSize(1920, 1080);
+            const tCamera = camera.clone();
+            tCamera.aspect = 1920 / 1080;
+            tCamera.updateProjectionMatrix();
+            tCamera.position.set(player.position.x + 20, 18, player.position.z + 20);
+            tCamera.lookAt(player.position.x, 3, player.position.z);
+            tRenderer.render(scene, tCamera);
+            
+            const canv = document.createElement('canvas');
+            canv.width = 1920; canv.height = 1080;
+            const ctx = canv.getContext('2d');
+            ctx.drawImage(tRenderer.domElement, 0, 0);
+            
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+            ctx.fillRect(0, 400, 1920, 350);
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'center';
+            ctx.shadowColor = "black"; ctx.shadowBlur = 15;
+            
+            ctx.font = 'bold 30px Arial';
+            ctx.fillText("PROYECTO ACADÉMICO: AIVA ACADEMIA", 960, 460);
+            
+            ctx.font = 'black 120px Arial';
+            ctx.fillText(name, 960, 560);
+            
+            ctx.font = 'bold 50px Arial';
+            ctx.fillStyle = '#60a5fa';
+            ctx.fillText('MAESTRO CONSTRUCTOR VOXEL', 960, 630);
+            
+            ctx.font = 'bold 60px Arial';
+            ctx.fillStyle = '#4ade80';
+            ctx.fillText('PUNTAJE FINAL: ' + score, 960, 710);
+            
+            const link = document.createElement('a');
+            link.download = `AIVA_Quest_${name}.jpg`;
+            link.href = canv.toDataURL('image/jpeg', 0.98);
+            link.click();
+            tRenderer.dispose();
+        }
+
+        // --- PARTES DE CASA ---
+        function createHousePart(level, style) {
+            const group = new THREE.Group();
+            const c = style.colors;
+            const mS = new THREE.MeshLambertMaterial({ color: c.stone });
+            const mW = new THREE.MeshLambertMaterial({ color: c.wood });
+            const mA = new THREE.MeshLambertMaterial({ color: c.wall });
+            const mR = new THREE.MeshLambertMaterial({ color: c.roof });
+            const mG = new THREE.MeshLambertMaterial({ color: c.glass, transparent: true, opacity: 0.7 });
+
+            switch(level) {
+                case 1: group.add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.4, 4.2), mS)).position.y = 0.2; break;
+                case 2: group.add(new THREE.Mesh(new THREE.BoxGeometry(3.8, 1, 3.8), mA)).position.y = 0.7; break;
+                case 3: group.add(new THREE.Mesh(new THREE.BoxGeometry(3.8, 1, 3.8), mA)).position.y = 1.7; break;
+                case 4: group.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.4, 0.15), mW)).position.set(0, 0.7, 1.9); break;
+                case 5: group.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), mG)).position.set(1.2, 1.6, 1.9); break;
+                case 6: group.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), mG)).position.set(-1.2, 1.6, 1.9); break;
+                case 7: group.add(new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.2, 4.6), mW)).position.y = 2.2; break;
+                case 8: group.add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 1.4, 4.2), mR)).position.y = 3.0; break;
+                case 9: group.add(new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.8, 0.6), mS)).position.set(1, 3.8, 0); break;
+                case 10: group.add(new THREE.Mesh(new THREE.BoxGeometry(7, 0.1, 7), new THREE.MeshLambertMaterial({color: 0x1e3a8a}))).position.y = 0.05; break;
+            }
+            return group;
+        }
+    </script>
+</body>
+</html>
