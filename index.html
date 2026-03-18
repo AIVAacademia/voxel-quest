@@ -41,22 +41,22 @@
 <body>
 
     <!-- Pantalla de Inicio -->
-    <div id="start-screen" class="absolute inset-0 flex items-center justify-center bg-slate-900 z-[100] p-4">
-        <div class="bg-white p-8 rounded-none pixel-border max-w-md w-full text-center border-t-8 border-blue-600 shadow-2xl">
+    <div id="start-screen" class="absolute inset-0 flex items-center justify-center bg-slate-900 z-[100] p-4 text-center">
+        <div class="bg-white p-8 rounded-none pixel-border max-w-md w-full border-t-8 border-blue-600 shadow-2xl">
             <div class="mb-2">
                 <span class="text-blue-600 font-bold text-xs tracking-[0.3em] uppercase">AIVA Academia</span>
             </div>
             <h1 class="text-4xl font-black mb-2 text-blue-800 uppercase leading-none text-pixel">VOXEL QUEST</h1>
             <p class="text-xs font-bold text-orange-500 mb-6 border-y-2 border-orange-100 py-1 uppercase tracking-widest">Constructor Tecnológico</p>
             
-            <input type="text" id="player-name" placeholder="Tu nombre..." 
+            <input type="text" id="player-name" placeholder="Escribe tu nombre..." 
                 class="w-full p-3 border-4 border-black mb-6 focus:outline-none focus:border-blue-500 font-bold text-center uppercase">
             
             <div class="flex flex-col gap-3">
                 <button onclick="startGame()" class="w-full aiva-gradient hover:opacity-90 text-white font-bold py-4 px-6 pixel-border transition-transform active:scale-95 shadow-lg interactive">
                     ¡INICIAR MISIÓN!
                 </button>
-                <button onclick="showInstructions()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-6 pixel-border text-sm interactive">
+                <button onclick="showInstructions()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-6 pixel-border text-sm interactive text-center">
                     📜 CÓMO JUGAR
                 </button>
             </div>
@@ -69,7 +69,7 @@
             <h2 class="text-2xl font-bold text-blue-700 mb-4 uppercase text-center tracking-tighter">Guía de AIVA Explorer</h2>
             <div class="h-64 overflow-y-auto pr-2 custom-scrollbar text-sm space-y-4">
                 <section class="bg-slate-50 p-3 border-l-4 border-blue-500">
-                    <h3 class="font-bold text-blue-600 uppercase mb-1">🕹️ Caminar</h3>
+                    <h3 class="font-bold text-blue-600 uppercase mb-1">🕹️ Movimiento</h3>
                     <p>Usa <b>Flechas</b> o <b>WASD</b> para moverte por la isla.</p>
                 </section>
                 <section class="bg-slate-50 p-3 border-l-4 border-orange-500">
@@ -113,7 +113,7 @@
 
             <div class="flex flex-col gap-2 items-end pointer-events-auto">
                 <div id="timer-box" class="bg-black text-white p-3 pixel-border hidden min-w-[120px] text-center border-blue-500 shadow-xl">
-                    <p class="text-[10px] uppercase font-bold text-blue-400">Energía</p>
+                    <p class="text-[10px] uppercase font-bold text-blue-400">Tiempo</p>
                     <p id="timer-ui" class="text-2xl font-black tracking-widest font-mono">00:60</p>
                 </div>
                 
@@ -129,14 +129,14 @@
                     </button>
                 </div>
 
-                <div id="camera-hint" class="hidden bg-blue-500 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">CÁMARA: RUEDA (ZOOM) | Q-E (ALTURA)</div>
-                <div id="build-hint" class="hidden bg-green-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">CONSTRUCCIÓN: ESPACIO (PONER) | 1-2 (GIRAR)</div>
-                <div id="flight-hint" class="hidden bg-purple-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">VUELO: R (SUBIR) | F (BAJAR)</div>
+                <div id="camera-hint" class="hidden bg-blue-500 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter">CÁMARA: RUEDA (ZOOM) | Q-E (ALTURA)</div>
+                <div id="build-hint" class="hidden bg-green-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter text-center">CONSTRUCCIÓN: ESPACIO (PONER) | 1-2 (GIRAR)</div>
+                <div id="flight-hint" class="hidden bg-purple-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter">VUELO: R (SUBIR) | F (BAJAR)</div>
             </div>
         </div>
 
         <!-- Selector de Objetos (Nivel 20+) -->
-        <div id="object-select-modal" class="hidden fixed inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-[80] p-4">
+        <div id="object-select-modal" class="hidden fixed inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-[80] p-4 text-center">
             <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-green-500 text-center shadow-2xl text-slate-800">
                 <h2 class="text-2xl font-black text-green-700 mb-4 uppercase">ELIGE TU RECOMPENSA</h2>
                 <p class="text-sm mb-6 font-bold uppercase tracking-tight">¡Has superado el reto Office! Selecciona qué construir:</p>
@@ -165,20 +165,36 @@
             <div class="bg-white p-8 pixel-border max-w-sm w-full interactive border-t-8 border-yellow-500 shadow-2xl">
                 <h1 class="text-3xl font-black text-blue-700 mb-4 uppercase">Misión Pausada</h1>
                 <p class="mb-8 text-slate-500 font-bold uppercase tracking-widest text-xs">Descansa y continúa cuando quieras</p>
-                <button onclick="togglePause()" class="w-full aiva-gradient text-white font-bold py-4 px-6 pixel-border hover:opacity-90 interactive">VOLVER A JUGAR</button>
+                <button onclick="togglePause()" class="w-full aiva-gradient text-white font-bold py-4 px-6 pixel-border hover:opacity-90 interactive uppercase tracking-widest">VOLVER A JUGAR</button>
             </div>
         </div>
 
         <!-- Exit Confirm -->
         <div id="exit-confirm-modal" class="hidden fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-95 z-[120] p-4 text-center">
-            <div class="bg-white p-8 pixel-border max-w-md w-full interactive border-t-8 border-red-500 shadow-2xl">
+            <div class="bg-white p-8 pixel-border max-w-md w-full interactive border-t-8 border-red-500 shadow-2xl text-black">
                 <h1 class="text-2xl font-black text-red-600 mb-2 uppercase">¿Salir de la Misión?</h1>
                 <p class="mb-8 text-slate-600 font-bold">Descarga una foto de tu villa tecnológica antes de irte.</p>
                 <div class="flex flex-col gap-3">
-                    <button onclick="downloadWallpaper()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 flex items-center justify-center gap-2 interactive">💾 DESCARGAR FOTO FINAL</button>
+                    <button onclick="downloadWallpaper()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 flex items-center justify-center gap-2 interactive uppercase shadow-sm">💾 DESCARGAR FOTO FINAL</button>
                     <div class="h-px bg-slate-200 my-4"></div>
-                    <button onclick="hideExitConfirm()" class="w-full bg-green-500 text-white font-bold py-3 px-6 pixel-border interactive transition-colors">CONTINUAR JUGANDO</button>
+                    <button onclick="hideExitConfirm()" class="w-full bg-green-500 text-white font-bold py-3 px-6 pixel-border interactive transition-colors uppercase shadow-sm">CONTINUAR JUGANDO</button>
                     <button onclick="confirmExit()" class="w-full text-slate-400 font-bold py-2 px-6 text-xs hover:text-red-500 uppercase interactive">Salir sin guardar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Victoria y Expansión -->
+        <div id="victory-screen" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-95 z-50 p-4 text-white text-center">
+            <div class="bg-white text-black p-8 pixel-border max-w-lg w-full interactive border-t-8 border-blue-500 shadow-2xl">
+                <h1 class="text-4xl font-black text-blue-800 mb-2 uppercase italic tracking-tighter">¡CASA BASE LISTA!</h1>
+                <p class="text-md mb-8 text-slate-600 font-bold text-sm">Has demostrado tu maestría técnica. Ahora desbloquearemos la expansión del mundo para que construyas tu villa.</p>
+                <div class="grid grid-cols-1 gap-4">
+                    <button onclick="continueToExpansion()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 px-6 pixel-border text-xl animate-pulse uppercase interactive">
+                        EXPANDIR EL MUNDO 🌍
+                    </button>
+                    <button onclick="downloadWallpaper()" class="bg-blue-100 text-blue-700 font-bold py-3 px-6 pixel-border text-xs uppercase interactive">
+                        Descargar fondo de pantalla actual
+                    </button>
                 </div>
             </div>
         </div>
@@ -196,7 +212,8 @@
             </div>
         </div>
 
-        <div id="level-complete" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-50 p-4">
+        <!-- Transición Nivel -->
+        <div id="level-complete" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-50 p-4 text-center">
             <div class="text-center text-white">
                 <h1 class="text-6xl font-black mb-4 italic tracking-tighter text-blue-300 uppercase">¡Nivel Logrado!</h1>
                 <p class="text-xl mb-10 font-bold uppercase tracking-widest" id="construction-update">Actualizando Arquitectura...</p>
@@ -239,7 +256,7 @@
             { q: "¿Qué es una LAN?", a: ["Red área local", "Una marca", "Un virus"], correct: 0 },
             { q: "¿Software principal de la PC?", a: ["Google", "Sistema Operativo", "Office"], correct: 1 },
             { q: "¿Componente para gráficos?", a: ["GPU", "Fuente", "Parlantes"], correct: 0 },
-            { q: "¿Qué significa IA?", a: ["Inteligencia Artificial", "Internet Avanzado", "Imagen Alta"], correct: 0 }
+            { q: "¿Qué significan las siglas IA?", a: ["Inteligencia Artificial", "Internet Avanzado", "Imagen Alta"], correct: 0 }
         ];
 
         const OFFICE_PROBLEMS = [
@@ -254,6 +271,8 @@
             { q: "¿En PowerPoint, qué tecla inicia presentación?", a: ["F1", "F5", "Esc"], correct: 1 },
             { q: "¿En Word, qué comando alinea bordes?", a: ["Centrar", "Justificar", "Sangría"], correct: 1 }
         ];
+
+        const islandGeo = new THREE.BoxGeometry(1, 1, 1);
 
         function init() {
             if (renderer) {
@@ -316,13 +335,12 @@
 
         function createIsland(radius) {
             islandGroup.clear();
-            const geo = new THREE.BoxGeometry(1, 1, 1);
             for(let x = -Math.floor(radius+2); x < radius+2; x++) {
                 for(let z = -Math.floor(radius+2); z < radius+2; z++) {
                     const d = Math.sqrt(x*x + z*z);
                     if(d < radius) {
                         const mat = new THREE.MeshLambertMaterial({color: d > radius-2 ? 0xddccaa : 0x4ade80});
-                        const b = new THREE.Mesh(geo, mat);
+                        const b = new THREE.Mesh(islandGeo, mat);
                         b.position.set(x, d > radius-2 ? -0.2 : -0.5, z);
                         islandGroup.add(b);
                     }
@@ -391,11 +409,8 @@
             let nearest = null, minDist = Infinity;
             treasures.forEach(t => { if(!t.collected) { let d = player.position.distanceTo(t.mesh.position); if(d < minDist) { minDist = d; nearest = t; }}});
             if(nearest) {
-                guidanceArrow.visible = true; 
-                guidanceArrow.position.set(player.position.x, player.position.y + 2.2, player.position.z);
-                guidanceArrow.lookAt(nearest.mesh.position); 
-                // Ajuste para que la punta del cono señale al frente
-                guidanceArrow.rotateX(Math.PI/2);
+                guidanceArrow.visible = true; guidanceArrow.position.set(player.position.x, player.position.y + 2.2, player.position.z);
+                guidanceArrow.lookAt(nearest.mesh.position); guidanceArrow.rotateX(-Math.PI/2);
             } else guidanceArrow.visible = false;
         }
 
@@ -488,7 +503,8 @@
                     const lUI = document.getElementById('level-ui'); if(lUI) lUI.innerText = currentLevel;
                     const gT = document.getElementById('goal-text'); if(gT) gT.innerHTML = "Planos: <span id='pieces-ui'>0</span> / <span id='target-ui'>4</span>";
                     updateHouseVisual(); spawnTreasures(); startTimer(90);
-                    gameActive = true; animate(); // REINICIAR LOOP
+                    clock.getDelta(); // Reiniciar reloj
+                    gameActive = true; animate(); 
                     showStatus("MUNDO EXPANDIDO", "#1e40af");
                 }
             }, 25);
