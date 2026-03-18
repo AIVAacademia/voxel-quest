@@ -2,14 +2,14 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AIVA Voxel Quest - Constructor Tecnológico</title>
     <!-- Librería 3D Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Tailwind CSS para Interfaz Moderna -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; }
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; touch-action: none; }
         canvas { display: block; }
         #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
         .interactive { pointer-events: auto; }
@@ -18,21 +18,23 @@
             border: 4px solid #000;
             box-shadow: 4px 4px 0px #1e293b;
         }
-        @keyframes pulse-red {
-            0%, 100% { color: white; }
-            50% { color: #ff4444; }
+        .mobile-btn {
+            width: 60px; height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            border: 2px solid white;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold;
+            user-select: none; -webkit-tap-highlight-color: transparent;
         }
+        .mobile-btn:active { background: rgba(255, 255, 255, 0.5); transform: scale(0.95); }
+        
+        @keyframes pulse-red { 0%, 100% { color: white; } 50% { color: #ff4444; } }
         .timer-warning { animation: pulse-red 0.5s infinite; }
-        .gold-glow { box-shadow: 0 0 20px rgba(255, 215, 0, 0.6); border-color: #ffd700; }
         .hint-anim { animation: bounce 2s infinite; }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        .aiva-gradient {
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-        }
-        .custom-scrollbar { scrollbar-width: thin; scrollbar-color: #3b82f6 #f1f1f1; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        .aiva-gradient { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); }
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
@@ -46,17 +48,17 @@
             <div class="mb-2">
                 <span class="text-blue-600 font-bold text-xs tracking-[0.3em] uppercase">AIVA Academia</span>
             </div>
-            <h1 class="text-4xl font-black mb-2 text-blue-800 uppercase leading-none text-pixel">VOXEL QUEST</h1>
+            <h1 class="text-3xl sm:text-4xl font-black mb-2 text-blue-800 uppercase leading-none">VOXEL QUEST</h1>
             <p class="text-xs font-bold text-orange-500 mb-6 border-y-2 border-orange-100 py-1 uppercase tracking-widest">Constructor Tecnológico</p>
             
             <input type="text" id="player-name" placeholder="Escribe tu nombre..." 
-                class="w-full p-3 border-4 border-black mb-6 focus:outline-none focus:border-blue-500 font-bold text-center uppercase">
+                class="w-full p-3 border-4 border-black mb-6 focus:outline-none focus:border-blue-500 font-bold text-center uppercase interactive">
             
             <div class="flex flex-col gap-3">
                 <button onclick="startGame()" class="w-full aiva-gradient hover:opacity-90 text-white font-bold py-4 px-6 pixel-border transition-transform active:scale-95 shadow-lg interactive">
                     ¡INICIAR MISIÓN!
                 </button>
-                <button onclick="showInstructions()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-6 pixel-border text-sm interactive text-center">
+                <button onclick="showInstructions()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-6 pixel-border text-sm interactive">
                     📜 CÓMO JUGAR
                 </button>
             </div>
@@ -66,27 +68,19 @@
     <!-- Modal de Instrucciones -->
     <div id="instructions-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-[110] p-4">
         <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-blue-600 shadow-2xl text-slate-800">
-            <h2 class="text-2xl font-bold text-blue-700 mb-4 uppercase text-center tracking-tighter">Guía de AIVA Explorer</h2>
+            <h2 class="text-xl font-bold text-blue-700 mb-4 uppercase text-center tracking-tighter">Guía de AIVA Explorer</h2>
             <div class="h-64 overflow-y-auto pr-2 custom-scrollbar text-sm space-y-4">
                 <section class="bg-slate-50 p-3 border-l-4 border-blue-500">
                     <h3 class="font-bold text-blue-600 uppercase mb-1">🕹️ Movimiento</h3>
-                    <p>Usa <b>Flechas</b> o <b>WASD</b> para moverte por la isla.</p>
+                    <p>Usa el <b>Pad</b> o <b>Teclas WASD</b> para caminar. La <b>Flecha Roja</b> te dice dónde está el tesoro.</p>
                 </section>
                 <section class="bg-slate-50 p-3 border-l-4 border-orange-500">
-                    <h3 class="font-bold text-orange-500 uppercase mb-1">🎥 Vista (Nivel 5+)</h3>
-                    <p><b>Rueda del Mouse:</b> Zoom.<br><b>Teclas Q / E:</b> Cambia la altura de la cámara.</p>
+                    <h3 class="font-bold text-orange-500 uppercase mb-1">🎥 Vista</h3>
+                    <p>Acércate con los botones <b>+ / -</b>. Cambia la altura con <b>Q / E</b>.</p>
                 </section>
                 <section class="bg-slate-50 p-3 border-l-4 border-green-500">
-                    <h3 class="font-bold text-green-500 uppercase mb-1">🔨 Construir (Nivel 10+)</h3>
-                    <p>Mueve el objeto fantasma con <b>WASD</b>.<br>Gira con <b>1 / 2</b>.<br>Colócalo con <b>ESPACIO</b>.</p>
-                </section>
-                <section class="bg-slate-50 p-3 border-l-4 border-purple-500">
-                    <h3 class="font-bold text-purple-500 uppercase mb-1">🚀 Vuelo (Nivel 15+)</h3>
-                    <p>Usa <b>R</b> para subir y <b>F</b> para bajar.</p>
-                </section>
-                <section class="bg-blue-100 p-3">
-                    <h3 class="font-bold text-blue-800 uppercase mb-1">💼 Nivel Office (20+)</h3>
-                    <p>¡Elige tu premio! Podrás seleccionar incluso nubes voladoras tras responder sobre Word, Excel o PowerPoint.</p>
+                    <h3 class="font-bold text-green-500 uppercase mb-1">🔨 Construcción</h3>
+                    <p>Tras responder, mueve el objeto con el Pad, gíralo con los botones y usa <b>PONER</b>.</p>
                 </section>
             </div>
             <button onclick="hideInstructions()" class="w-full mt-6 bg-blue-600 text-white font-bold py-3 px-6 pixel-border transition-colors interactive">
@@ -98,126 +92,124 @@
     <!-- HUD -->
     <div id="ui-layer">
         <div class="flex justify-between p-4 items-start">
-            <div id="stats" class="bg-white p-3 pixel-border hidden pointer-events-auto shadow-xl">
+            <div id="stats" class="bg-white p-2 sm:p-3 pixel-border hidden pointer-events-auto shadow-xl max-w-[150px] sm:max-w-none">
                 <div class="flex items-center gap-2 mb-1">
                     <div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                    <p class="font-bold text-xs text-blue-600 uppercase tracking-tighter"><span id="display-name">-</span> | AIVA STUDENT</p>
+                    <p class="font-bold text-[10px] sm:text-xs text-blue-600 uppercase truncate"><span id="display-name">-</span></p>
                 </div>
-                <div class="grid grid-cols-2 gap-x-4 mt-2">
-                    <p class="font-bold text-xs uppercase text-gray-500">Nivel: <span id="level-ui" class="text-purple-600 text-sm font-black">1</span></p>
-                    <p class="font-bold text-xs uppercase text-gray-500">Score: <span id="score-ui" class="text-green-600 text-sm font-black">0</span></p>
-                    <p class="font-bold text-xs uppercase text-gray-500 col-span-2 mt-1" id="goal-text">Objetivo: <span id="pieces-ui" class="text-orange-500 text-sm">0</span>/<span id="target-ui">3</span></p>
+                <div class="grid grid-cols-2 gap-x-2 mt-1">
+                    <p class="font-bold text-[10px] text-gray-500">LV: <span id="level-ui" class="text-purple-600 font-black">1</span></p>
+                    <p class="font-bold text-[10px] text-gray-500">PTS: <span id="score-ui" class="text-green-600 font-black">0</span></p>
+                    <p class="font-bold text-[10px] text-gray-500 col-span-2 mt-1" id="goal-text">OBJ: <span id="pieces-ui" class="text-orange-500">0</span>/<span id="target-ui">3</span></p>
                 </div>
-                <p class="text-[9px] font-bold mt-2 text-slate-400 tracking-[0.2em] uppercase border-t pt-1 italic">ESTILO: <span id="style-ui" class="text-blue-500 font-normal">NORMAL</span></p>
+                <p class="text-[9px] font-bold mt-1 text-slate-400 uppercase border-t pt-1 italic">ESTILO: <span id="style-ui">NORMAL</span></p>
             </div>
 
             <div class="flex flex-col gap-2 items-end pointer-events-auto">
-                <div id="timer-box" class="bg-black text-white p-3 pixel-border hidden min-w-[120px] text-center border-blue-500 shadow-xl">
-                    <p class="text-[10px] uppercase font-bold text-blue-400">Tiempo</p>
-                    <p id="timer-ui" class="text-2xl font-black tracking-widest font-mono">00:60</p>
+                <div id="timer-box" class="bg-black text-white p-2 sm:p-3 pixel-border hidden min-w-[80px] text-center border-blue-500 shadow-xl">
+                    <p id="timer-ui" class="text-xl sm:text-2xl font-black font-mono">00:60</p>
                 </div>
                 
-                <div class="flex gap-2">
-                    <button onclick="showInstructions()" id="btn-info" class="hidden bg-blue-600 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-blue-700 interactive">
-                        INFO
-                    </button>
-                    <button onclick="togglePause()" id="btn-pause" class="hidden bg-yellow-500 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-yellow-600 interactive">
-                        PAUSA
-                    </button>
-                    <button onclick="showExitConfirm()" class="bg-red-500 text-white p-2 pixel-border font-bold text-xs hover:bg-red-600 hidden interactive shadow-md" id="btn-exit">
-                        SALIR
-                    </button>
+                <div class="flex gap-1 sm:gap-2">
+                    <button onclick="showInstructions()" id="btn-info" class="hidden bg-blue-600 text-white p-2 pixel-border font-bold text-[10px] interactive">INFO</button>
+                    <button onclick="togglePause()" id="btn-pause" class="hidden bg-yellow-500 text-white p-2 pixel-border font-bold text-[10px] interactive">PAUSA</button>
+                    <button onclick="showExitConfirm()" class="bg-red-500 text-white p-2 pixel-border font-bold text-[10px] hidden interactive shadow-md" id="btn-exit">SALIR</button>
                 </div>
-
-                <div id="camera-hint" class="hidden bg-blue-500 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter">CÁMARA: RUEDA (ZOOM) | Q-E (ALTURA)</div>
-                <div id="build-hint" class="hidden bg-green-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter text-center">CONSTRUCCIÓN: ESPACIO (PONER) | 1-2 (GIRAR)</div>
-                <div id="flight-hint" class="hidden bg-purple-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter">VUELO: R (SUBIR) | F (BAJAR)</div>
             </div>
         </div>
 
-        <!-- Selector de Objetos (Nivel 20+) -->
-        <div id="object-select-modal" class="hidden fixed inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-[80] p-4 text-center">
-            <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-green-500 text-center shadow-2xl text-slate-800">
-                <h2 class="text-2xl font-black text-green-700 mb-4 uppercase">ELIGE TU RECOMPENSA</h2>
-                <p class="text-sm mb-6 font-bold uppercase tracking-tight">¡Has superado el reto Office! Selecciona qué construir:</p>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <button onclick="selectBlueprint('tree')" class="p-4 bg-slate-100 hover:bg-green-100 pixel-border font-bold text-xs uppercase interactive">🌳 Árbol</button>
-                    <button onclick="selectBlueprint('car')" class="p-4 bg-slate-100 hover:bg-blue-100 pixel-border font-bold text-xs uppercase interactive">🚗 Auto</button>
-                    <button onclick="selectBlueprint('bench')" class="p-4 bg-slate-100 hover:bg-orange-100 pixel-border font-bold text-xs uppercase interactive">🪑 Banco</button>
-                    <button onclick="selectBlueprint('lamp')" class="p-4 bg-slate-100 hover:bg-yellow-100 pixel-border font-bold text-xs uppercase interactive">💡 Lámpara</button>
-                    <button onclick="selectBlueprint('flower')" class="p-4 bg-slate-100 hover:bg-pink-100 pixel-border font-bold text-xs uppercase interactive">🌸 Flores</button>
-                    <button onclick="selectBlueprint('cloud')" class="p-4 aiva-gradient text-white pixel-border font-bold text-xs uppercase animate-pulse interactive">☁️ Nube Vuelo</button>
+        <!-- Botones de Zoom para Móvil -->
+        <div id="zoom-controls" class="hidden absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-4 pointer-events-none">
+            <button class="mobile-btn interactive" onmousedown="handleZoom(-1)" ontouchstart="handleZoom(-1)">➕</button>
+            <button class="mobile-btn interactive" onmousedown="handleZoom(1)" ontouchstart="handleZoom(1)">➖</button>
+        </div>
+
+        <!-- Controles Táctiles -->
+        <div id="mobile-joystick" class="hidden absolute bottom-8 left-8 flex flex-col items-center gap-2 pointer-events-auto">
+            <button class="mobile-btn" ontouchstart="keys.w=true" ontouchend="keys.w=false">▲</button>
+            <div class="flex gap-10">
+                <button class="mobile-btn" ontouchstart="keys.a=true" ontouchend="keys.a=false">◀</button>
+                <button class="mobile-btn" ontouchstart="keys.d=true" ontouchend="keys.d=false">▶</button>
+            </div>
+            <button class="mobile-btn" ontouchstart="keys.s=true" ontouchend="keys.s=false">▼</button>
+        </div>
+
+        <div id="mobile-actions" class="hidden absolute bottom-8 right-8 flex flex-col gap-4 items-end pointer-events-auto">
+            <div id="flight-btns" class="hidden flex gap-4">
+                <button class="mobile-btn bg-purple-600" ontouchstart="keys.r=true" ontouchend="keys.r=false">UP</button>
+                <button class="mobile-btn bg-purple-600" ontouchstart="keys.f=true" ontouchend="keys.f=false">DN</button>
+            </div>
+            <div id="build-btns" class="hidden flex flex-col gap-2">
+                <div class="flex gap-2">
+                    <button class="mobile-btn bg-green-500" ontouchstart="handleRotation(1)">↺</button>
+                    <button class="mobile-btn bg-green-500" ontouchstart="handleRotation(-1)">↻</button>
+                </div>
+                <button class="mobile-btn bg-green-600 w-full" ontouchstart="placeObject()">PONER</button>
+            </div>
+            <div id="cam-height-btns" class="hidden flex gap-4">
+                <button class="mobile-btn bg-blue-400" ontouchstart="keys.q=true" ontouchend="keys.q=false">C ▲</button>
+                <button class="mobile-btn bg-blue-400" ontouchstart="keys.e=true" ontouchend="keys.e=false">C ▼</button>
+            </div>
+        </div>
+
+        <!-- Selector de Objetos -->
+        <div id="object-select-modal" class="hidden fixed inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-[120] p-4 text-center">
+            <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-green-500 text-center shadow-2xl">
+                <h2 class="text-xl font-black text-green-700 mb-4 uppercase">ELIGE TU PREMIO</h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="selectBlueprint('tree')" class="p-4 bg-slate-100 pixel-border font-bold text-[10px] uppercase interactive">🌳 Árbol</button>
+                    <button onclick="selectBlueprint('car')" class="p-4 bg-slate-100 pixel-border font-bold text-[10px] uppercase interactive">🚗 Auto</button>
+                    <button onclick="selectBlueprint('bench')" class="p-4 bg-slate-100 pixel-border font-bold text-[10px] uppercase interactive">🪑 Banco</button>
+                    <button onclick="selectBlueprint('lamp')" class="p-4 bg-slate-100 pixel-border font-bold text-[10px] uppercase interactive">💡 Luz</button>
+                    <button onclick="selectBlueprint('flower')" class="p-4 bg-slate-100 pixel-border font-bold text-[10px] uppercase interactive">🌸 Flor</button>
+                    <button onclick="selectBlueprint('cloud')" class="p-4 aiva-gradient text-white pixel-border font-bold text-[10px] uppercase interactive">☁️ Nube</button>
                 </div>
             </div>
         </div>
 
         <!-- Quiz Modal -->
-        <div id="quiz-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 p-4 z-40">
+        <div id="quiz-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 p-4 z-[140]">
             <div class="bg-white p-6 pixel-border max-w-sm w-full interactive text-center border-t-8 border-blue-600 shadow-2xl">
                 <p id="quiz-tag" class="text-[10px] font-black text-blue-600 uppercase mb-2">Desafío AIVA</p>
-                <p id="quiz-question" class="mb-8 text-lg font-bold leading-tight text-slate-800">...</p>
+                <p id="quiz-question" class="mb-8 text-md font-bold leading-tight text-slate-800">...</p>
                 <div id="quiz-options" class="grid grid-cols-1 gap-3"></div>
             </div>
         </div>
 
-        <!-- Pausa -->
-        <div id="pause-screen" class="hidden fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-90 z-50 p-4 text-center">
-            <div class="bg-white p-8 pixel-border max-w-sm w-full interactive border-t-8 border-yellow-500 shadow-2xl">
-                <h1 class="text-3xl font-black text-blue-700 mb-4 uppercase">Misión Pausada</h1>
-                <p class="mb-8 text-slate-500 font-bold uppercase tracking-widest text-xs">Descansa y continúa cuando quieras</p>
-                <button onclick="togglePause()" class="w-full aiva-gradient text-white font-bold py-4 px-6 pixel-border hover:opacity-90 interactive uppercase tracking-widest">VOLVER A JUGAR</button>
-            </div>
-        </div>
-
-        <!-- Exit Confirm -->
-        <div id="exit-confirm-modal" class="hidden fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-95 z-[120] p-4 text-center">
-            <div class="bg-white p-8 pixel-border max-w-md w-full interactive border-t-8 border-red-500 shadow-2xl text-black">
-                <h1 class="text-2xl font-black text-red-600 mb-2 uppercase">¿Salir de la Misión?</h1>
-                <p class="mb-8 text-slate-600 font-bold">Descarga una foto de tu villa tecnológica antes de irte.</p>
+        <!-- Modales de Estado -->
+        <div id="exit-confirm-modal" class="hidden fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-95 z-[150] p-4 text-center text-black">
+            <div class="bg-white p-8 pixel-border max-w-md w-full interactive border-t-8 border-red-500 shadow-2xl">
+                <h1 class="text-2xl font-black text-red-600 mb-2 uppercase">¿Salir del Juego?</h1>
                 <div class="flex flex-col gap-3">
-                    <button onclick="downloadWallpaper()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 flex items-center justify-center gap-2 interactive uppercase shadow-sm">💾 DESCARGAR FOTO FINAL</button>
-                    <div class="h-px bg-slate-200 my-4"></div>
-                    <button onclick="hideExitConfirm()" class="w-full bg-green-500 text-white font-bold py-3 px-6 pixel-border interactive transition-colors uppercase shadow-sm">CONTINUAR JUGANDO</button>
-                    <button onclick="confirmExit()" class="w-full text-slate-400 font-bold py-2 px-6 text-xs hover:text-red-500 uppercase interactive">Salir sin guardar</button>
+                    <button onclick="downloadWallpaper()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border interactive uppercase shadow-sm">💾 DESCARGAR FOTO FINAL</button>
+                    <button onclick="hideExitConfirm()" class="w-full bg-green-500 text-white font-bold py-3 px-6 pixel-border interactive uppercase">CONTINUAR</button>
+                    <button onclick="confirmExit()" class="w-full text-slate-400 font-bold py-2 px-6 text-xs interactive">Salir sin guardar</button>
                 </div>
             </div>
         </div>
 
-        <!-- Victoria y Expansión -->
-        <div id="victory-screen" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-95 z-50 p-4 text-white text-center">
-            <div class="bg-white text-black p-8 pixel-border max-w-lg w-full interactive border-t-8 border-blue-500 shadow-2xl">
-                <h1 class="text-4xl font-black text-blue-800 mb-2 uppercase italic tracking-tighter">¡CASA BASE LISTA!</h1>
-                <p class="text-md mb-8 text-slate-600 font-bold text-sm">Has demostrado tu maestría técnica. Ahora desbloquearemos la expansión del mundo para que construyas tu villa.</p>
-                <div class="grid grid-cols-1 gap-4">
-                    <button onclick="continueToExpansion()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 px-6 pixel-border text-xl animate-pulse uppercase interactive">
-                        EXPANDIR EL MUNDO 🌍
-                    </button>
-                    <button onclick="downloadWallpaper()" class="bg-blue-100 text-blue-700 font-bold py-3 px-6 pixel-border text-xs uppercase interactive">
-                        Descargar fondo de pantalla actual
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Game Over -->
-        <div id="game-over" class="hidden absolute inset-0 flex items-center justify-center bg-red-950 bg-opacity-95 z-[130] p-4 text-white text-center">
-            <div class="bg-white p-8 pixel-border max-w-sm w-full interactive border-t-8 border-red-600 shadow-2xl text-black">
-                <h1 class="text-3xl font-black text-red-600 mb-2 uppercase leading-none text-pixel">Energía Agotada</h1>
-                <p class="mb-8 text-slate-600 font-bold text-sm tracking-tight">¿Necesitas recargar el sistema para completar tu villa de AIVA?</p>
+        <div id="game-over" class="hidden absolute inset-0 flex items-center justify-center bg-red-950 bg-opacity-95 z-[130] p-4 text-white text-center text-black">
+            <div class="bg-white p-8 pixel-border max-w-sm w-full interactive border-t-8 border-red-600 shadow-2xl">
+                <h1 class="text-3xl font-black text-red-600 mb-2 uppercase leading-none">Energía Agotada</h1>
                 <div class="flex flex-col gap-3">
-                    <button onclick="retryContinue()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 transition-colors interactive shadow-md">RECARGAR (+40 SEG)</button>
-                    <button onclick="downloadWallpaper()" class="w-full bg-slate-100 text-slate-700 font-bold py-3 px-6 pixel-border w-full text-xs transition-colors interactive shadow-sm">GUARDAR FOTO ACTUAL</button>
-                    <button onclick="confirmExit()" class="w-full text-slate-400 py-2 text-[10px] uppercase hover:text-red-500 interactive">Reiniciar misión</button>
+                    <button onclick="retryContinue()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border interactive shadow-md">RECARGAR (+40 SEG)</button>
+                    <button onclick="downloadWallpaper()" class="w-full bg-slate-100 text-slate-700 font-bold py-3 px-6 pixel-border interactive">GUARDAR FOTO</button>
+                    <button onclick="confirmExit()" class="w-full text-slate-400 py-2 text-[10px] interactive uppercase">Reiniciar</button>
                 </div>
             </div>
         </div>
 
-        <!-- Transición Nivel -->
+        <div id="victory-screen" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-95 z-50 p-4 text-white text-center text-black">
+            <div class="bg-white p-8 pixel-border max-w-lg w-full interactive border-t-8 border-blue-500 shadow-2xl">
+                <h1 class="text-3xl font-black text-blue-800 mb-2 uppercase italic">¡CASA BASE LISTA!</h1>
+                <button onclick="continueToExpansion()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 px-6 pixel-border text-xl animate-pulse uppercase interactive w-full shadow-lg">EXPANDIR EL MUNDO 🌍</button>
+            </div>
+        </div>
+
         <div id="level-complete" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-50 p-4 text-center">
             <div class="text-center text-white">
-                <h1 class="text-6xl font-black mb-4 italic tracking-tighter text-blue-300 uppercase">¡Nivel Logrado!</h1>
-                <p class="text-xl mb-10 font-bold uppercase tracking-widest" id="construction-update">Actualizando Arquitectura...</p>
-                <div class="w-80 bg-slate-800 h-6 pixel-border mx-auto overflow-hidden">
+                <h1 class="text-4xl sm:text-6xl font-black mb-4 italic tracking-tighter text-blue-300 uppercase">¡Nivel Logrado!</h1>
+                <div class="w-64 sm:w-80 bg-slate-800 h-6 pixel-border mx-auto overflow-hidden">
                     <div id="level-progress" class="bg-blue-400 h-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
@@ -227,36 +219,30 @@
     </div>
 
     <script>
-        // --- MOTOR Y CONFIGURACIÓN ---
+        // --- MOTOR ---
         let scene, camera, renderer, player, clock, guidanceArrow;
         let treasures = [], extraObjects = [];
         let score = 0, currentLevel = 1, piecesFound = 0;
         let timeLeft = 60, timerInterval;
         let keys = { w: false, a: false, s: false, d: false, q: false, e: false, r: false, f: false, space: false, 1: false, 2: false };
-        let activeTreasure = null, gameActive = false, isExpansionMode = false, isPaused = false;
-        let houseGroup, currentStyle, islandGroup;
-        let islandRadius = 14;
-
-        let isPlacing = false, ghostObject = null, currentBlueprintType = null;
-        let camDistance = 12, camHeight = 10;
+        let activeTreasure = null, gameActive = false, isExpansionMode = false, isPaused = false, isPlacing = false;
+        let houseGroup, currentStyle, islandGroup, ghostObject, currentBlueprintType;
+        let islandRadius = 14, camDistance = 12, camHeight = 10;
 
         const HOUSE_STYLES = [
             { name: "CIUDAD AIVA", colors: { stone: 0x888888, wood: 0x8b4513, wall: 0xeeeeee, roof: 0x2563eb, glass: 0xbfdbfe, car: 0x1e40af, leaf: 0x16a34a, flower: 0xec4899, cloud: 0xffffff } },
-            { name: "LABORATORIO", colors: { stone: 0x334155, wood: 0x1e293b, wall: 0x94a3b8, roof: 0x0ea5e9, glass: 0xffffff, car: 0x64748b, leaf: 0x22c55e, flower: 0xef4444, cloud: 0xe2e8f0 } },
-            { name: "VILLA TECH", colors: { stone: 0x555555, wood: 0x5d4037, wall: 0xd1d5db, roof: 0x059669, glass: 0x93c5fd, car: 0x475569, leaf: 0x064e3b, flower: 0xfde047, cloud: 0xffffff } }
+            { name: "LABORATORIO", colors: { stone: 0x334155, wood: 0x1e293b, wall: 0x94a3b8, roof: 0x0ea5e9, glass: 0xffffff, car: 0x64748b, leaf: 0x22c55e, flower: 0xef4444, cloud: 0xe2e8f0 } }
         ];
 
         const PROBLEMS = [
             { q: "¿Cerebro de la computadora?", a: ["CPU", "RAM", "GPU"], correct: 0 },
             { q: "¿Almacenamiento permanente?", a: ["RAM", "SSD / HDD", "Pantalla"], correct: 1 },
             { q: "¿Memoria rápida que se borra al apagar?", a: ["USB", "CD", "RAM"], correct: 2 },
-            { q: "¿Qué significa USB?", a: ["Universal Serial Bus", "Unit System Boot", "Ultra Bus"], correct: 0 },
-            { q: "¿Periférico de entrada?", a: ["Monitor", "Mouse", "Parlantes"], correct: 1 },
+            { q: "¿Qué significa USB?", a: ["Universal Serial Bus", "Unit System", "Ultra Bus"], correct: 0 },
             { q: "¿A cuántos bits equivale un Byte?", a: ["4", "8", "16"], correct: 1 },
-            { q: "¿Qué es una LAN?", a: ["Red área local", "Una marca", "Un virus"], correct: 0 },
+            { q: "¿Qué dispositivo da Wi-Fi?", a: ["Escáner", "Router", "Micrófono"], correct: 1 },
             { q: "¿Software principal de la PC?", a: ["Google", "Sistema Operativo", "Office"], correct: 1 },
-            { q: "¿Componente para gráficos?", a: ["GPU", "Fuente", "Parlantes"], correct: 0 },
-            { q: "¿Qué significan las siglas IA?", a: ["Inteligencia Artificial", "Internet Avanzado", "Imagen Alta"], correct: 0 }
+            { q: "¿Qué componente genera los gráficos?", a: ["GPU", "Fuente", "Parlantes"], correct: 0 }
         ];
 
         const OFFICE_PROBLEMS = [
@@ -264,12 +250,9 @@
             { q: "¿Excel: con qué símbolo inicia fórmula?", a: ["+", "=", "$"], correct: 1 },
             { q: "¿Cómo se llama archivo PowerPoint?", a: ["Documento", "Hoja", "Presentación"], correct: 2 },
             { q: "¿En Excel, qué es una celda?", a: ["Dibujo", "Fila x Columna", "Letra"], correct: 1 },
-            { q: "¿Cómo se llaman diapositivas en PowerPoint?", a: ["Láminas", "Diapositivas", "Capas"], correct: 1 },
-            { q: "¿Cuál es la extensión de Excel?", a: [".docx", ".xlsx", ".pptx"], correct: 1 },
-            { q: "¿En Excel, qué función suma celdas?", a: ["=TOTAL()", "=SUMA()", "=AÑADIR()"], correct: 1 },
-            { q: "¿En Word, qué es la Sangría?", a: ["Color", "Espacio al inicio", "Borrar"], correct: 1 },
-            { q: "¿En PowerPoint, qué tecla inicia presentación?", a: ["F1", "F5", "Esc"], correct: 1 },
-            { q: "¿En Word, qué comando alinea bordes?", a: ["Centrar", "Justificar", "Sangría"], correct: 1 }
+            { q: "¿Cómo se llaman las hojas en PowerPoint?", a: ["Láminas", "Diapositivas", "Capas"], correct: 1 },
+            { q: "¿Extensión común de Word?", a: [".docx", ".xlsx", ".pptx"], correct: 0 },
+            { q: "¿En Excel, qué función suma celdas?", a: ["=TOTAL()", "=SUMA()", "=AÑADIR()"], correct: 1 }
         ];
 
         const islandGeo = new THREE.BoxGeometry(1, 1, 1);
@@ -285,17 +268,14 @@
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio > 2 ? 2 : window.devicePixelRatio);
             document.body.appendChild(renderer.domElement);
             scene.add(new THREE.AmbientLight(0xffffff, 0.7));
             const sun = new THREE.DirectionalLight(0xffffff, 0.9);
             sun.position.set(10, 35, 25);
             scene.add(sun);
-            islandGroup = new THREE.Group();
-            scene.add(islandGroup);
-            createIsland(islandRadius);
-            houseGroup = new THREE.Group();
-            scene.add(houseGroup);
-            updateHouseVisual();
+            islandGroup = new THREE.Group(); scene.add(islandGroup); createIsland(islandRadius);
+            houseGroup = new THREE.Group(); scene.add(houseGroup); updateHouseVisual();
             player = new THREE.Group();
             player.add(new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.0, 0.4), new THREE.MeshLambertMaterial({color: 0x2563eb})));
             player.position.set(0, 0.5, 6);
@@ -309,6 +289,12 @@
             setupEvents();
             gameActive = true;
             animate();
+
+            if ('ontouchstart' in window) {
+                document.getElementById('mobile-joystick').classList.remove('hidden');
+                document.getElementById('mobile-actions').classList.remove('hidden');
+                document.getElementById('zoom-controls').classList.remove('hidden');
+            }
         }
 
         function setupEvents() {
@@ -329,18 +315,20 @@
                     if(k==='arrowleft') keys.a = false; if(k==='arrowright') keys.d = false;
                 } else keys[k] = false;
             };
-            window.onwheel = (e) => { if (currentLevel >= 5 && !isPaused) camDistance = Math.max(5, Math.min(50, camDistance + e.deltaY * 0.01)); };
+            window.onwheel = (e) => { if (currentLevel >= 5 && !isPaused) handleZoom(e.deltaY * 0.01); };
             window.onresize = () => { if (camera) { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); } if (renderer) renderer.setSize(window.innerWidth, window.innerHeight); };
         }
 
+        function handleZoom(amount) { camDistance = Math.max(5, Math.min(50, camDistance + amount)); }
+        function handleRotation(dir) { if(isPlacing && ghostObject) ghostObject.rotation.y += dir * (Math.PI/8); }
+
         function createIsland(radius) {
             islandGroup.clear();
-            for(let x = -Math.floor(radius+2); x < radius+2; x++) {
-                for(let z = -Math.floor(radius+2); z < radius+2; z++) {
+            for(let x = -Math.floor(radius+1); x < radius+1; x++) {
+                for(let z = -Math.floor(radius+1); z < radius+1; z++) {
                     const d = Math.sqrt(x*x + z*z);
                     if(d < radius) {
-                        const mat = new THREE.MeshLambertMaterial({color: d > radius-2 ? 0xddccaa : 0x4ade80});
-                        const b = new THREE.Mesh(islandGeo, mat);
+                        const b = new THREE.Mesh(islandGeo, new THREE.MeshLambertMaterial({color: d > radius-2 ? 0xddccaa : 0x4ade80}));
                         b.position.set(x, d > radius-2 ? -0.2 : -0.5, z);
                         islandGroup.add(b);
                     }
@@ -351,8 +339,14 @@
         function updateHouseVisual() {
             houseGroup.clear();
             for(let i=1; i < currentLevel; i++) if(i <= 10) houseGroup.add(createHousePart(i, currentStyle));
-            const camH = document.getElementById('camera-hint'); if(camH && currentLevel >= 5) camH.classList.remove('hidden');
-            const fliH = document.getElementById('flight-hint'); if(fliH && currentLevel >= 15) fliH.classList.remove('hidden');
+            if(currentLevel >= 5) {
+                document.getElementById('camera-hint').classList.remove('hidden');
+                document.getElementById('cam-height-btns').classList.remove('hidden');
+            }
+            if(currentLevel >= 15) {
+                document.getElementById('flight-hint').classList.remove('hidden');
+                document.getElementById('flight-btns').classList.remove('hidden');
+            }
         }
 
         function spawnTreasures() {
@@ -360,7 +354,7 @@
             treasures = []; piecesFound = 0;
             const target = isExpansionMode ? 4 : Math.min(currentLevel + 2, 8);
             const tUI = document.getElementById('target-ui'); if(tUI) tUI.innerText = target;
-            const pUI = document.getElementById('pieces-ui'); if(pUI) pUI.innerText = 0;
+            const pUI = document.getElementById('pieces-ui'); if(pUI) pUI.innerText = piecesFound;
             for(let i = 0; i < target; i++) {
                 const model = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.7), new THREE.MeshLambertMaterial({color: 0x2563eb}));
                 const limit = islandRadius - 5;
@@ -397,11 +391,10 @@
                 }
                 if(isPlacing && ghostObject) {
                     ghostObject.position.lerp(player.position, 0.2);
-                    if(keys['1']) ghostObject.rotation.y += 0.05; if(keys['2']) ghostObject.rotation.y -= 0.05;
                     camera.lookAt(ghostObject.position);
                 }
                 treasures.forEach(t => { if(!t.collected) t.mesh.rotation.y += 0.06; });
-            } else clock.getDelta(); 
+            }
             renderer.render(scene, camera);
         }
 
@@ -409,14 +402,14 @@
             let nearest = null, minDist = Infinity;
             treasures.forEach(t => { if(!t.collected) { let d = player.position.distanceTo(t.mesh.position); if(d < minDist) { minDist = d; nearest = t; }}});
             if(nearest) {
-                guidanceArrow.visible = true; guidanceArrow.position.set(player.position.x, player.position.y + 2.2, player.position.z);
-                guidanceArrow.lookAt(nearest.mesh.position); guidanceArrow.rotateX(-Math.PI/2);
+                guidanceArrow.visible = true; 
+                guidanceArrow.position.set(player.position.x, player.position.y + 2.5, player.position.z);
+                guidanceArrow.lookAt(nearest.mesh.position); 
+                guidanceArrow.rotateX(Math.PI/2);
             } else guidanceArrow.visible = false;
         }
 
-        function checkCollisions() {
-            treasures.forEach(t => { if(!t.collected && player.position.distanceTo(t.mesh.position) < 1.4) triggerQuiz(t); });
-        }
+        function checkCollisions() { treasures.forEach(t => { if(!t.collected && player.position.distanceTo(t.mesh.position) < 1.4) triggerQuiz(t); }); }
 
         function triggerQuiz(treasure) {
             activeTreasure = treasure;
@@ -439,7 +432,7 @@
         }
 
         function checkAnswer(sel, cor) {
-            const modal = document.getElementById('quiz-modal'); if(modal) modal.classList.add('hidden');
+            document.getElementById('quiz-modal').classList.add('hidden');
             if(sel === cor) {
                 activeTreasure.collected = true; scene.remove(activeTreasure.mesh);
                 piecesFound++; score += 300;
@@ -463,8 +456,9 @@
             ghostObject = createBlueprint(currentBlueprintType, currentStyle);
             ghostObject.traverse(n => { if(n.isMesh) { n.material = n.material.clone(); n.material.transparent = true; n.material.opacity = 0.6; }});
             scene.add(ghostObject);
-            const bH = document.getElementById('build-hint'); if(bH) bH.classList.remove('hidden');
-            showStatus("UBICA TU RECOMPENSA", "#3b82f6");
+            const bh = document.getElementById('build-hint'); if(bh) bh.classList.remove('hidden');
+            const btns = document.getElementById('build-btns'); if(btns) btns.classList.remove('hidden');
+            showStatus("ELIGE LA UBICACIÓN", "#3b82f6");
         }
 
         function placeObject() {
@@ -472,21 +466,23 @@
             finalObj.position.copy(ghostObject.position); finalObj.rotation.copy(ghostObject.rotation);
             scene.add(finalObj); extraObjects.push(finalObj);
             scene.remove(ghostObject); ghostObject = null; isPlacing = false;
-            const bH = document.getElementById('build-hint'); if(bH) bH.classList.add('hidden');
+            const bh = document.getElementById('build-hint'); if(bh) bh.classList.add('hidden');
+            const btns = document.getElementById('build-btns'); if(btns) btns.classList.add('hidden');
             if(piecesFound >= (isExpansionMode ? 4 : 8)) { currentLevel++; isExpansionMode ? nextLevelExpansion() : nextLevel(); }
         }
 
         function nextLevel() {
             gameActive = false;
-            if(currentLevel === 10) { const vs = document.getElementById('victory-screen'); if(vs) vs.classList.remove('hidden'); return; }
+            if(currentLevel === 10) { document.getElementById('victory-screen').classList.remove('hidden'); return; }
             const screen = document.getElementById('level-complete');
-            const uT = document.getElementById('construction-update'); if(uT) uT.innerText = "Fase " + currentLevel + " completada";
+            const progress = document.getElementById('level-progress');
+            if(progress) progress.style.width = "0%";
             if(screen) screen.classList.remove('hidden');
             setTimeout(() => {
-                const prog = document.getElementById('level-progress'); if(prog) prog.style.width = "100%";
+                if(progress) progress.style.width = "100%";
                 setTimeout(() => {
                     currentLevel++; updateHouseVisual(); spawnTreasures(); startTimer(60);
-                    if(screen) screen.classList.add('hidden'); if(prog) prog.style.width = "0%";
+                    if(screen) screen.classList.add('hidden'); 
                     const lUI = document.getElementById('level-ui'); if(lUI) lUI.innerText = currentLevel;
                     gameActive = true; animate();
                 }, 1000);
@@ -494,30 +490,33 @@
         }
 
         function continueToExpansion() {
-            const vs = document.getElementById('victory-screen'); if(vs) vs.classList.add('hidden');
+            document.getElementById('victory-screen').classList.add('hidden');
             piecesFound = 0; isExpansionMode = true; gameActive = false;
             const interval = setInterval(() => {
                 islandRadius += 0.5; createIsland(islandRadius);
                 if(islandRadius >= 40) {
                     clearInterval(interval);
                     const lUI = document.getElementById('level-ui'); if(lUI) lUI.innerText = currentLevel;
-                    const gT = document.getElementById('goal-text'); if(gT) gT.innerHTML = "Planos: <span id='pieces-ui'>0</span> / <span id='target-ui'>4</span>";
+                    const gt = document.getElementById('goal-text'); if(gt) gt.innerHTML = "Planos: <span id='pieces-ui'>0</span> / <span id='target-ui'>4</span>";
                     updateHouseVisual(); spawnTreasures(); startTimer(90);
-                    clock.getDelta(); // Reiniciar reloj
-                    gameActive = true; animate(); 
-                    showStatus("MUNDO EXPANDIDO", "#1e40af");
+                    if(clock) clock.getDelta();
+                    gameActive = true; animate();
+                    showStatus("MUNDO AIVA EXPANDIDO", "#1e40af");
                 }
             }, 25);
         }
 
         function nextLevelExpansion() {
             gameActive = false;
-            const screen = document.getElementById('level-complete'); if(screen) screen.classList.remove('hidden');
+            const screen = document.getElementById('level-complete');
+            const progress = document.getElementById('level-progress');
+            if(progress) progress.style.width = "0%";
+            if(screen) screen.classList.remove('hidden');
             setTimeout(() => {
-                const prog = document.getElementById('level-progress'); if(prog) prog.style.width = "100%";
+                if(progress) progress.style.width = "100%";
                 setTimeout(() => {
                     spawnTreasures(); startTimer(90);
-                    if(screen) screen.classList.add('hidden'); if(prog) prog.style.width = "0%";
+                    if(screen) screen.classList.add('hidden');
                     const lUI = document.getElementById('level-ui'); if(lUI) lUI.innerText = currentLevel;
                     gameActive = true; animate();
                 }, 1000);
@@ -525,18 +524,18 @@
         }
 
         function startGame() {
-            const nInput = document.getElementById('player-name');
-            const name = nInput ? nInput.value : "";
-            if(!name) return alert("Por favor, ingresa tu nombre de explorador.");
+            const nameInput = document.getElementById('player-name');
+            const name = nameInput ? nameInput.value : "";
+            if(!name) return alert("Por favor, ingresa tu nombre.");
             currentStyle = HOUSE_STYLES[Math.floor(Math.random() * HOUSE_STYLES.length)];
             const sUI = document.getElementById('style-ui'); if(sUI) sUI.innerText = currentStyle.name;
             const dUI = document.getElementById('display-name'); if(dUI) dUI.innerText = name;
             document.getElementById('start-screen').classList.add('hidden');
-            const stats = document.getElementById('stats'); if(stats) stats.classList.remove('hidden');
-            const timerBox = document.getElementById('timer-box'); if(timerBox) timerBox.classList.remove('hidden');
-            const btnExit = document.getElementById('btn-exit'); if(btnExit) btnExit.classList.remove('hidden');
-            const btnPause = document.getElementById('btn-pause'); if(btnPause) btnPause.classList.remove('hidden');
-            const btnInfo = document.getElementById('btn-info'); if(btnInfo) btnInfo.classList.remove('hidden');
+            document.getElementById('stats').classList.remove('hidden');
+            document.getElementById('timer-box').classList.remove('hidden');
+            document.getElementById('btn-exit').classList.remove('hidden');
+            document.getElementById('btn-pause').classList.remove('hidden');
+            document.getElementById('btn-info').classList.remove('hidden');
             init();
         }
 
@@ -549,7 +548,7 @@
 
         function startTimer(sec) {
             timeLeft = sec; updateTimerDisplay(); clearInterval(timerInterval);
-            timerInterval = setInterval(() => { if(!gameActive || activeTreasure || isPaused || isPlacing) return; timeLeft--; updateTimerDisplay(); if(timeLeft <= 0) { gameActive = false; clearInterval(timerInterval); const go = document.getElementById('game-over'); if(go) go.classList.remove('hidden'); }}, 1000);
+            timerInterval = setInterval(() => { if(!gameActive || activeTreasure || isPaused || isPlacing) return; timeLeft--; updateTimerDisplay(); if(timeLeft <= 0) { gameActive = false; clearInterval(timerInterval); document.getElementById('game-over').classList.remove('hidden'); }}, 1000);
         }
 
         function updateTimerDisplay() {
@@ -558,17 +557,13 @@
         }
 
         function retryContinue() { 
-            const go = document.getElementById('game-over'); if(go) go.classList.add('hidden'); 
-            gameActive = true; 
-            if(clock) clock.getDelta(); 
-            startTimer(40); 
-            animate(); 
-            showStatus("RECARGADO", "#2563eb"); 
+            document.getElementById('game-over').classList.add('hidden'); 
+            gameActive = true; if(clock) clock.getDelta(); startTimer(40); animate(); showStatus("RECARGADO", "#2563eb"); 
         }
         
         function downloadWallpaper() {
-            const nInput = document.getElementById('player-name');
-            const name = (nInput && nInput.value ? nInput.value : "Explorador").toUpperCase();
+            const nameInput = document.getElementById('player-name');
+            const name = (nameInput && nameInput.value ? nameInput.value : "Explorador").toUpperCase();
             const tr = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
             tr.setSize(1920, 1080);
             const tc = camera.clone(); tc.aspect = 1920/1080; tc.updateProjectionMatrix();
@@ -576,20 +571,52 @@
             tr.render(scene, tc);
             const cv = document.createElement('canvas'); cv.width = 1920; cv.height = 1080;
             const cx = cv.getContext('2d'); cx.drawImage(tr.domElement, 0, 0);
-            cx.fillStyle = 'rgba(15, 23, 42, 0.9)'; cx.fillRect(40, 780, 700, 260);
-            cx.fillStyle = '#2563eb'; cx.fillRect(40, 780, 700, 8);
-            cx.textAlign = 'left'; cx.shadowColor = "black"; cx.shadowBlur = 5;
-            cx.fillStyle = '#60a5fa'; cx.font = 'bold 24px Arial'; cx.fillText("PROYECTO: AIVA ACADEMIA", 70, 830);
-            cx.fillStyle = '#ffffff'; cx.font = 'black 80px Arial'; cx.fillText(name, 70, 910);
-            cx.font = 'bold 36px Arial'; cx.fillStyle = '#ffd700'; cx.fillText(`MAESTRO CONSTRUCTOR | NIVEL: ${currentLevel}`, 70, 960);
-            cx.font = 'bold 42px Arial'; cx.fillStyle = '#4ade80'; cx.fillText(`PUNTAJE LOGRADO: ${score}`, 70, 1010);
-            const link = document.createElement('a'); link.download = `AIVA_Voxel_Quest_${name}.jpg`; link.href = cv.toDataURL('image/jpeg', 0.95); link.click(); tr.dispose();
+            
+            // --- TARJETA DE INFORMACIÓN INFANTIL (ESQUINA) ---
+            const cardX = 40, cardY = 740, cardW = 750, cardH = 300;
+            
+            // Fondo colorido con bordes redondeados (simulado)
+            cx.fillStyle = '#ffffff';
+            cx.shadowColor = 'rgba(0,0,0,0.5)'; cx.shadowBlur = 20;
+            cx.fillRect(cardX, cardY, cardW, cardH);
+            cx.shadowBlur = 0;
+
+            // Borde superior arcoíris / divertido
+            cx.fillStyle = '#FFD700'; cx.fillRect(cardX, cardY, cardW, 15); // Amarillo
+            cx.fillStyle = '#2563eb'; cx.fillRect(cardX, cardY + 15, cardW, 5); // Azul
+            
+            // Iconos y detalles
+            cx.textAlign = 'left';
+            cx.fillStyle = '#1e40af';
+            cx.font = 'bold 28px Arial';
+            cx.fillText("⭐ AIVA ACADEMIA - JUNIOR ARCHITECT ⭐", cardX + 30, cardY + 60);
+            
+            // Nombre en GRANDE y COLORIDO
+            cx.font = 'black 90px Arial';
+            cx.fillStyle = '#e11d48'; // Rojo divertido
+            cx.fillText(name, cardX + 30, cardY + 150);
+            
+            // Estadísticas en verde y naranja
+            cx.font = 'bold 45px Arial';
+            cx.fillStyle = '#059669'; // Verde
+            cx.fillText(`¡NIVEL ALCANZADO: ${currentLevel}!`, cardX + 30, cardY + 215);
+            
+            cx.fillStyle = '#ea580c'; // Naranja
+            cx.fillText(`¡PUNTAJE FINAL: ${score}!`, cardX + 30, cardY + 270);
+
+            // Sello final
+            cx.textAlign = 'right';
+            cx.fillStyle = 'rgba(0,0,0,0.1)';
+            cx.font = 'italic 100px Arial';
+            cx.fillText("TOP", 1880, 1000);
+            
+            const link = document.createElement('a'); link.download = `AIVA_Voxel_Diploma_${name}.jpg`; link.href = cv.toDataURL('image/jpeg', 0.95); link.click(); tr.dispose();
         }
 
-        function showInstructions() { const mod = document.getElementById('instructions-modal'); if(mod) mod.classList.remove('hidden'); }
-        function hideInstructions() { const mod = document.getElementById('instructions-modal'); if(mod) mod.classList.add('hidden'); }
-        function showExitConfirm() { isPaused = true; const mod = document.getElementById('exit-confirm-modal'); if(mod) mod.classList.remove('hidden'); }
-        function hideExitConfirm() { isPaused = false; const mod = document.getElementById('exit-confirm-modal'); if(mod) mod.classList.add('hidden'); }
+        function showInstructions() { document.getElementById('instructions-modal').classList.remove('hidden'); }
+        function hideInstructions() { document.getElementById('instructions-modal').classList.add('hidden'); }
+        function showExitConfirm() { isPaused = true; document.getElementById('exit-confirm-modal').classList.remove('hidden'); }
+        function hideExitConfirm() { isPaused = false; document.getElementById('exit-confirm-modal').classList.add('hidden'); }
         function confirmExit() { location.reload(); }
         function showStatus(t, c) { const m = document.getElementById('status-msg'); if(m) { m.innerText = t; m.style.backgroundColor = c; m.classList.remove('hidden'); setTimeout(() => m.classList.add('hidden'), 3000); } }
 
@@ -599,7 +626,7 @@
             if(l===1) g.add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.4, 4.2), mat(c.stone))).position.y=0.2;
             if(l===2 || l===3) g.add(new THREE.Mesh(new THREE.BoxGeometry(3.8, 1, 3.8), mat(c.wall))).position.y = l===2 ? 0.7 : 1.7;
             if(l===4) g.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.4, 0.15), mat(c.wood))).position.set(0, 0.7, 1.9);
-            if(l===5 || l===6) g.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), mat(c.glass, true))).position.set(l===5?1.2:-1.2, 1.6, 1.9);
+            if(l===5 || l===6) g.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), mat(c.glass))).position.set(l===5?1.2:-1.2, 1.6, 1.9);
             if(l===7) g.add(new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.2, 4.6), mat(c.wood))).position.y = 2.2;
             if(l===8) g.add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 1.4, 4.2), mat(c.roof))).position.y = 3.0;
             if(l===9) g.add(new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.8, 0.6), mat(c.stone))).position.set(1, 3.8, 0);
