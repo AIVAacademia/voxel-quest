@@ -11,7 +11,7 @@
     <style>
         body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; }
         canvas { display: block; }
-        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
         .interactive { pointer-events: auto; }
         .pixel-border {
             image-rendering: pixelated;
@@ -32,6 +32,7 @@
         .aiva-gradient {
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
         }
+        .custom-scrollbar { scrollbar-width: thin; scrollbar-color: #3b82f6 #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar { width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 4px; }
@@ -40,60 +41,56 @@
 <body>
 
     <!-- Pantalla de Inicio -->
-    <div id="start-screen" class="absolute inset-0 flex items-center justify-center bg-slate-900 z-50 p-4">
-        <div class="bg-white p-8 rounded-none pixel-border max-w-md w-full text-center border-t-8 border-blue-600">
+    <div id="start-screen" class="absolute inset-0 flex items-center justify-center bg-slate-900 z-[100] p-4">
+        <div class="bg-white p-8 rounded-none pixel-border max-w-md w-full text-center border-t-8 border-blue-600 shadow-2xl">
             <div class="mb-2">
                 <span class="text-blue-600 font-bold text-xs tracking-[0.3em] uppercase">AIVA Academia</span>
             </div>
             <h1 class="text-4xl font-black mb-2 text-blue-800 uppercase leading-none">VOXEL QUEST</h1>
             <p class="text-xs font-bold text-orange-500 mb-6 border-y-2 border-orange-100 py-1 uppercase tracking-widest">Constructor Tecnológico</p>
             
-            <input type="text" id="player-name" placeholder="Escribe tu nombre de explorador..." 
+            <input type="text" id="player-name" placeholder="Tu nombre..." 
                 class="w-full p-3 border-4 border-black mb-6 focus:outline-none focus:border-blue-500 font-bold text-center uppercase">
             
             <div class="flex flex-col gap-3">
-                <button onclick="startGame()" class="w-full aiva-gradient hover:opacity-90 text-white font-bold py-4 px-6 pixel-border transition-transform active:scale-95 shadow-lg">
+                <button onclick="startGame()" class="w-full aiva-gradient hover:opacity-90 text-white font-bold py-4 px-6 pixel-border transition-transform active:scale-95 shadow-lg interactive">
                     ¡INICIAR MISIÓN!
                 </button>
-                <button onclick="showInstructions()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-6 pixel-border text-sm">
+                <button onclick="showInstructions()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2 px-6 pixel-border text-sm interactive">
                     📜 CÓMO JUGAR
                 </button>
             </div>
-            <p class="mt-6 text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Powered by AIVA Education Engine</p>
         </div>
     </div>
 
     <!-- Modal de Instrucciones -->
-    <div id="instructions-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-[70] p-4">
-        <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-blue-600">
+    <div id="instructions-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-[110] p-4">
+        <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-blue-600 shadow-2xl">
             <h2 class="text-2xl font-bold text-blue-700 mb-4 uppercase text-center tracking-tighter">Manual de AIVA Explorer</h2>
             <div class="h-64 overflow-y-auto pr-2 custom-scrollbar text-sm space-y-4 text-slate-700">
-                <section class="bg-slate-50 p-3 border-l-4 border-blue-500">
+                <section class="bg-slate-50 p-3 border-l-4 border-blue-500 text-left">
                     <h3 class="font-bold text-blue-600 uppercase mb-1">🕹️ Caminar</h3>
-                    <p>Usa las <b>Teclas WASD</b> o las <b>Flechas</b> para explorar la isla.</p>
+                    <p>Usa las <b>Flechas</b> o <b>WASD</b> para moverte por la isla.</p>
                 </section>
-                <section class="bg-slate-50 p-3 border-l-4 border-orange-500">
-                    <h3 class="font-bold text-orange-500 uppercase mb-1">🎥 Vista (Nivel 5+)</h3>
+                <section class="bg-slate-50 p-3 border-l-4 border-orange-500 text-left">
+                    <h3 class="font-bold text-orange-500 uppercase mb-1">🎥 Cámara (Nivel 5+)</h3>
                     <p><b>Rueda del Mouse:</b> Zoom.<br><b>Teclas Q / E:</b> Cambia la altura de la cámara.</p>
                 </section>
-                <section class="bg-slate-50 p-3 border-l-4 border-green-500">
+                <section class="bg-slate-50 p-3 border-l-4 border-green-500 text-left">
                     <h3 class="font-bold text-green-500 uppercase mb-1">🔨 Construir (Nivel 10+)</h3>
-                    <p>Al ganar un plano, podrás elegir el lugar:<br>
-                    <b>WASD:</b> Posiciona el objeto fantasma.<br>
-                    <b>Teclas 1 / 2:</b> Rota el objeto.<br>
-                    <b>ESPACIO:</b> Construir definitivamente.</p>
+                    <p>Mueve el objeto con <b>WASD</b>.<br>Gira con <b>1 / 2</b>.<br>Ponlo con <b>ESPACIO</b>.</p>
                 </section>
-                <section class="bg-slate-50 p-3 border-l-4 border-purple-500">
+                <section class="bg-slate-50 p-3 border-l-4 border-purple-500 text-left">
                     <h3 class="font-bold text-purple-500 uppercase mb-1">🚀 Vuelo (Nivel 15+)</h3>
-                    <p><b>Tecla R:</b> Subir.<br><b>Tecla F:</b> Bajar.</p>
+                    <p>Usa <b>R</b> para subir y <b>F</b> para bajar.</p>
                 </section>
-                <section class="bg-blue-100 p-3">
-                    <h3 class="font-bold text-blue-800 uppercase mb-1">🎯 Tu Misión</h3>
-                    <p>Recupera las piezas de hardware para construir tu casa. Responde correctamente para ganar puntos y materiales.</p>
+                <section class="bg-blue-100 p-3 border-l-4 border-blue-700 text-left">
+                    <h3 class="font-bold text-blue-800 uppercase mb-1">💼 Nivel Office (20+)</h3>
+                    <p>¡Elige tu propio premio! Desbloquea incluso nubes voladoras tras responder sobre Word, Excel o PowerPoint.</p>
                 </section>
             </div>
-            <button onclick="hideInstructions()" class="w-full mt-6 bg-blue-600 text-white font-bold py-3 px-6 pixel-border transition-colors">
-                ¡ESTOY LISTO!
+            <button onclick="hideInstructions()" class="w-full mt-6 bg-blue-600 text-white font-bold py-3 px-6 pixel-border transition-colors interactive">
+                ¡ENTENDIDO!
             </button>
         </div>
     </div>
@@ -101,7 +98,7 @@
     <!-- HUD -->
     <div id="ui-layer">
         <div class="flex justify-between p-4 items-start">
-            <div id="stats" class="bg-white p-3 pixel-border hidden pointer-events-auto">
+            <div id="stats" class="bg-white p-3 pixel-border hidden pointer-events-auto shadow-xl">
                 <div class="flex items-center gap-2 mb-1">
                     <div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
                     <p class="font-bold text-xs text-blue-600 uppercase tracking-tighter"><span id="display-name">-</span> | AIVA STUDENT</p>
@@ -111,36 +108,44 @@
                     <p class="font-bold text-xs uppercase text-gray-500">Score: <span id="score-ui" class="text-green-600 text-sm font-black">0</span></p>
                     <p class="font-bold text-xs uppercase text-gray-500 col-span-2 mt-1" id="goal-text">Objetivo: <span id="pieces-ui" class="text-orange-500 text-sm">0</span>/<span id="target-ui">3</span></p>
                 </div>
-                <p class="text-[9px] font-bold mt-2 text-slate-300 tracking-[0.2em] uppercase border-t pt-1">ESTILO: <span id="style-ui">NORMAL</span></p>
             </div>
 
             <div class="flex flex-col gap-2 items-end pointer-events-auto">
-                <div id="timer-box" class="bg-black text-white p-3 pixel-border hidden min-w-[120px] text-center border-blue-500">
-                    <p class="text-[10px] uppercase font-bold text-blue-400">Energía de Tiempo</p>
+                <div id="timer-box" class="bg-black text-white p-3 pixel-border hidden min-w-[120px] text-center border-blue-500 shadow-xl">
+                    <p class="text-[10px] uppercase font-bold text-blue-400">Tiempo</p>
                     <p id="timer-ui" class="text-2xl font-black tracking-widest font-mono">00:60</p>
                 </div>
                 
                 <div class="flex gap-2">
-                    <button onclick="showInstructions()" id="btn-info" class="hidden bg-blue-600 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-blue-700 transition-colors shadow-sm">
-                        INSTRUCCIONES
+                    <button onclick="showInstructions()" id="btn-info" class="hidden bg-blue-600 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-blue-700 interactive">
+                        INFO
                     </button>
-                    <button onclick="togglePause()" id="btn-pause" class="hidden bg-yellow-500 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-yellow-600 transition-colors shadow-sm">
+                    <button onclick="togglePause()" id="btn-pause" class="hidden bg-yellow-500 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-yellow-600 interactive">
                         PAUSA
                     </button>
-                    <button onclick="showExitConfirm()" class="bg-red-500 text-white p-2 pixel-border font-bold text-xs hover:bg-red-600 hidden shadow-sm" id="btn-exit">
+                    <button onclick="showExitConfirm()" class="bg-red-500 text-white p-2 pixel-border font-bold text-xs hover:bg-red-600 hidden interactive shadow-md" id="btn-exit">
                         SALIR
                     </button>
                 </div>
 
-                <!-- Hints -->
-                <div id="camera-hint" class="hidden bg-blue-500 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim">
-                    CÁMARA: RUEDA (ZOOM) | Q-E (ALTURA)
-                </div>
-                <div id="build-hint" class="hidden bg-green-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim">
-                    CONSTRUCCIÓN: ESPACIO (PONER) | 1-2 (GIRAR)
-                </div>
-                <div id="flight-hint" class="hidden bg-purple-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim">
-                    VUELO DESBLOQUEADO: R (SUBIR) | F (BAJAR)
+                <div id="camera-hint" class="hidden bg-blue-500 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">CÁMARA: RUEDA (ZOOM) | Q-E (ALTURA)</div>
+                <div id="build-hint" class="hidden bg-green-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">CONSTRUCCIÓN: ESPACIO (PONER) | 1-2 (GIRAR)</div>
+                <div id="flight-hint" class="hidden bg-purple-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">VUELO: R (SUBIR) | F (BAJAR)</div>
+            </div>
+        </div>
+
+        <!-- Selector de Objetos (Nivel 20+) -->
+        <div id="object-select-modal" class="hidden fixed inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-[80] p-4">
+            <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-green-500 text-center shadow-2xl">
+                <h2 class="text-2xl font-black text-green-700 mb-4 uppercase">ELIGE TU RECOMPENSA</h2>
+                <p class="text-sm text-slate-500 mb-6 font-bold uppercase tracking-tight">¡Has superado el reto Office! Selecciona qué construir:</p>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <button onclick="selectBlueprint('tree')" class="p-4 bg-slate-100 hover:bg-green-100 pixel-border font-bold text-xs uppercase interactive transition-colors">🌳 Árbol</button>
+                    <button onclick="selectBlueprint('car')" class="p-4 bg-slate-100 hover:bg-blue-100 pixel-border font-bold text-xs uppercase interactive transition-colors">🚗 Auto</button>
+                    <button onclick="selectBlueprint('bench')" class="p-4 bg-slate-100 hover:bg-orange-100 pixel-border font-bold text-xs uppercase interactive transition-colors">🪑 Banco</button>
+                    <button onclick="selectBlueprint('lamp')" class="p-4 bg-slate-100 hover:bg-yellow-100 pixel-border font-bold text-xs uppercase interactive transition-colors">💡 Lámpara</button>
+                    <button onclick="selectBlueprint('flower')" class="p-4 bg-slate-100 hover:bg-pink-100 pixel-border font-bold text-xs uppercase interactive transition-colors">🌸 Flores</button>
+                    <button onclick="selectBlueprint('cloud')" class="p-4 aiva-gradient text-white pixel-border font-bold text-xs uppercase animate-pulse interactive">☁️ Nube Vuelo</button>
                 </div>
             </div>
         </div>
@@ -148,95 +153,54 @@
         <!-- Quiz Modal -->
         <div id="quiz-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 p-4 z-40">
             <div class="bg-white p-6 pixel-border max-w-sm w-full interactive text-center border-t-8 border-blue-600 shadow-2xl">
-                <p class="text-[10px] font-black text-blue-600 uppercase mb-2">Desafío Técnico AIVA</p>
+                <p id="quiz-tag" class="text-[10px] font-black text-blue-600 uppercase mb-2">Desafío AIVA</p>
                 <p id="quiz-question" class="mb-8 text-lg font-bold leading-tight text-slate-800">...</p>
                 <div id="quiz-options" class="grid grid-cols-1 gap-3"></div>
             </div>
         </div>
 
         <!-- Pausa -->
-        <div id="pause-screen" class="hidden fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-90 z-50 p-4">
-            <div class="bg-white p-8 pixel-border text-center max-w-sm w-full interactive border-t-8 border-yellow-500">
+        <div id="pause-screen" class="hidden fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-90 z-50 p-4 text-center">
+            <div class="bg-white p-8 pixel-border max-w-sm w-full interactive border-t-8 border-yellow-500 shadow-2xl">
                 <h1 class="text-3xl font-black text-blue-700 mb-4 uppercase">Misión Pausada</h1>
-                <p class="mb-8 text-slate-500 font-bold">¡Recupera energías para seguir construyendo!</p>
-                <button onclick="togglePause()" class="w-full aiva-gradient text-white font-bold py-4 px-6 pixel-border hover:opacity-90">
-                    VOLVER A LA ISLA
-                </button>
+                <p class="mb-8 text-slate-500 font-bold uppercase tracking-widest text-xs">Descansa y continúa cuando quieras</p>
+                <button onclick="togglePause()" class="w-full aiva-gradient text-white font-bold py-4 px-6 pixel-border hover:opacity-90 interactive">VOLVER A JUGAR</button>
             </div>
         </div>
 
-        <!-- Confirmación de Salida -->
-        <div id="exit-confirm-modal" class="hidden fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-95 z-[60] p-4">
-            <div class="bg-white p-8 pixel-border text-center max-w-md w-full interactive border-t-8 border-red-500 shadow-2xl">
-                <h1 class="text-2xl font-black text-red-600 mb-2 uppercase">¿Abandonar Misión?</h1>
-                <p class="mb-8 text-slate-600 font-bold">Guarda una foto de tus logros en AIVA Academia antes de salir.</p>
+        <!-- Exit Confirm -->
+        <div id="exit-confirm-modal" class="hidden fixed inset-0 flex items-center justify-center bg-slate-900 bg-opacity-95 z-[120] p-4 text-center">
+            <div class="bg-white p-8 pixel-border max-w-md w-full interactive border-t-8 border-red-500 shadow-2xl">
+                <h1 class="text-2xl font-black text-red-600 mb-2 uppercase">¿Salir de la Misión?</h1>
+                <p class="mb-8 text-slate-600 font-bold">Descarga una foto de tu villa tecnológica antes de irte.</p>
                 <div class="flex flex-col gap-3">
-                    <button onclick="downloadWallpaper()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 flex items-center justify-center gap-2">
-                        💾 DESCARGAR FOTO FINAL
-                    </button>
+                    <button onclick="downloadWallpaper()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 flex items-center justify-center gap-2 interactive">💾 DESCARGAR FOTO FINAL</button>
                     <div class="h-px bg-slate-200 my-4"></div>
-                    <button onclick="hideExitConfirm()" class="w-full bg-green-500 text-white font-bold py-3 px-6 pixel-border hover:bg-green-600">
-                        CONTINUAR JUGANDO
-                    </button>
-                    <button onclick="confirmExit()" class="w-full text-slate-400 font-bold py-2 px-6 text-xs hover:text-red-500 uppercase italic">
-                        Salir sin guardar nada
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Victoria y Expansión -->
-        <div id="victory-screen" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-95 z-50 p-4 text-white">
-            <div class="bg-white text-black p-8 pixel-border text-center max-w-lg w-full interactive border-t-8 border-blue-500 shadow-2xl">
-                <h1 class="text-4xl font-black text-blue-800 mb-2 uppercase italic tracking-tighter">¡CASA BASE LISTA!</h1>
-                <p class="text-md mb-8 text-slate-600 font-bold text-sm">Has demostrado tu maestría técnica. Ahora desbloquearemos la expansión del mundo para que construyas tu villa.</p>
-                <div class="grid grid-cols-1 gap-4">
-                    <button onclick="continueToExpansion()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 px-6 pixel-border text-xl animate-pulse uppercase">
-                        EXPANDIR EL MUNDO 🌍
-                    </button>
-                    <button onclick="downloadWallpaper()" class="bg-blue-100 text-blue-700 font-bold py-3 px-6 pixel-border text-xs uppercase">
-                        Descargar fondo de pantalla actual
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Level Logrado -->
-        <div id="level-complete" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-50 p-4">
-            <div class="text-center text-white">
-                <h1 class="text-6xl font-black mb-4 italic tracking-tighter text-blue-300">¡NIVEL LOGRADO!</h1>
-                <p class="text-xl mb-10 font-bold uppercase tracking-widest" id="construction-update">Actualizando Arquitectura...</p>
-                <div class="w-80 bg-slate-800 h-6 pixel-border mx-auto overflow-hidden">
-                    <div id="level-progress" class="bg-blue-400 h-full transition-all duration-1000" style="width: 0%"></div>
+                    <button onclick="hideExitConfirm()" class="w-full bg-green-500 text-white font-bold py-3 px-6 pixel-border interactive">CONTINUAR JUGANDO</button>
+                    <button onclick="confirmExit()" class="w-full text-slate-400 font-bold py-2 px-6 text-xs hover:text-red-500 uppercase interactive">Salir sin guardar</button>
                 </div>
             </div>
         </div>
 
         <!-- Game Over -->
-        <div id="game-over" class="hidden absolute inset-0 flex items-center justify-center bg-red-950 bg-opacity-95 z-50 p-4 text-white">
-            <div class="bg-white p-8 pixel-border text-center max-w-sm text-black border-t-8 border-red-600 shadow-2xl">
+        <div id="game-over" class="hidden absolute inset-0 flex items-center justify-center bg-red-950 bg-opacity-95 z-[90] p-4 text-white text-center">
+            <div class="bg-white p-8 pixel-border max-w-sm w-full interactive border-t-8 border-red-600 shadow-2xl">
                 <h1 class="text-3xl font-black text-red-600 mb-2 uppercase leading-none">Energía Agotada</h1>
-                <p class="mb-8 text-slate-600 font-bold text-sm leading-tight text-sm">¿Necesitas más tiempo para completar tu construcción tecnológica?</p>
+                <p class="mb-8 text-slate-600 font-bold text-sm tracking-tight">¿Necesitas recargar el sistema para completar tu villa de AIVA?</p>
                 <div class="flex flex-col gap-3">
-                    <button onclick="retryContinue()" class="bg-blue-600 text-white font-bold py-4 px-6 pixel-border w-full hover:bg-blue-700 transition-colors">
-                        RECARGAR (+40 SEG)
-                    </button>
-                    <button onclick="downloadWallpaper()" class="bg-slate-100 text-slate-700 font-bold py-3 px-6 pixel-border w-full text-xs transition-colors">
-                        Descargar mi avance actual
-                    </button>
-                    <button onclick="confirmExit()" class="w-full text-slate-400 py-2 text-[10px] uppercase hover:text-red-500 transition-colors">Reiniciar partida</button>
+                    <button onclick="retryContinue()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 transition-colors interactive">RECARGAR (+40 SEG)</button>
+                    <button onclick="downloadWallpaper()" class="w-full bg-slate-100 text-slate-700 font-bold py-3 px-6 pixel-border w-full text-xs transition-colors interactive">GUARDAR FOTO ACTUAL</button>
+                    <button onclick="confirmExit()" class="w-full text-slate-400 py-2 text-[10px] uppercase hover:text-red-500 interactive">Reiniciar misión</button>
                 </div>
             </div>
         </div>
-        
-        <div id="status-msg" class="hidden absolute top-28 left-1/2 transform -translate-x-1/2 aiva-gradient text-white p-2 pixel-border font-bold text-[10px] z-30 uppercase tracking-widest shadow-xl border-white border-opacity-20">
-            MENSAJE
-        </div>
+
+        <div id="status-msg" class="hidden absolute top-28 left-1/2 transform -translate-x-1/2 aiva-gradient text-white p-2 pixel-border font-bold text-[10px] z-30 shadow-xl uppercase">MENSAJE</div>
     </div>
 
     <script>
-        // --- MOTOR Y CONFIGURACIÓN ---
-        let scene, camera, renderer, player, clock;
+        // --- MOTOR CORE ---
+        let scene, camera, renderer, player, clock, guidanceArrow;
         let treasures = [], extraObjects = [];
         let score = 0, currentLevel = 1, piecesFound = 0;
         let timeLeft = 60, timerInterval;
@@ -249,87 +213,66 @@
         let camDistance = 12, camHeight = 10;
 
         const HOUSE_STYLES = [
-            { name: "CIUDAD AIVA", colors: { stone: 0x888888, wood: 0x8b4513, wall: 0xeeeeee, roof: 0x2563eb, glass: 0xbfdbfe, car: 0x1e40af, leaf: 0x16a34a, flower: 0xec4899 } },
-            { name: "LABORATORIO", colors: { stone: 0x334155, wood: 0x1e293b, wall: 0x94a3b8, roof: 0x0ea5e9, glass: 0xffffff, car: 0x64748b, leaf: 0x22c55e, flower: 0xef4444 } },
-            { name: "VILLA TECH", colors: { stone: 0x555555, wood: 0x5d4037, wall: 0xd1d5db, roof: 0x059669, glass: 0x93c5fd, car: 0x475569, leaf: 0x064e3b, flower: 0xfde047 } }
+            { name: "CIUDAD AIVA", colors: { stone: 0x888888, wood: 0x8b4513, wall: 0xeeeeee, roof: 0x2563eb, glass: 0xbfdbfe, car: 0x1e40af, leaf: 0x16a34a, flower: 0xec4899, cloud: 0xffffff } },
+            { name: "LABORATORIO", colors: { stone: 0x334155, wood: 0x1e293b, wall: 0x94a3b8, roof: 0x0ea5e9, glass: 0xffffff, car: 0x64748b, leaf: 0x22c55e, flower: 0xef4444, cloud: 0xe2e8f0 } }
         ];
 
         const PROBLEMS = [
-            { q: "¿Cuál es el componente que actúa como el cerebro de la computadora?", a: ["Procesador (CPU)", "Memoria RAM", "Monitor"], correct: 0 },
-            { q: "¿Dónde se almacenan los archivos de forma permanente?", a: ["Memoria RAM", "Disco Duro / SSD", "Teclado"], correct: 1 },
-            { q: "¿Qué tipo de memoria es rápida pero se borra al apagar?", a: ["Tarjeta SD", "Disco Duro", "Memoria RAM"], correct: 2 },
-            { q: "¿Qué significan las siglas USB?", a: ["Universal Serial Bus", "Unit System Boot", "Ultra Speed Bus"], correct: 0 },
-            { q: "¿Cuál de estos es un periférico de entrada?", a: ["Parlantes", "Mouse", "Monitor"], correct: 1 },
-            { q: "¿Qué placa conecta todos los componentes internos?", a: ["Placa Base (Motherboard)", "Tarjeta de Video", "BIOS"], correct: 0 },
-            { q: "¿A cuántos bits equivale exactamente un Byte?", a: ["4 bits", "8 bits", "16 bits"], correct: 1 },
-            { q: "¿Qué dispositivo permite la conexión Wi-Fi?", a: ["Escáner", "Router", "Micrófono"], correct: 1 },
-            { q: "¿Qué es una LAN?", a: ["Red de área local", "Una marca de PC", "Un virus de internet"], correct: 0 },
-            { q: "¿Qué cable usamos para internet cableado?", a: ["HDMI", "Ethernet / RJ45", "VGA"], correct: 1 },
-            { q: "¿Cuál es el cerebro de la computadora?", a: ["CPU", "RAM", "GPU"], correct: 0 },
-            { q: "¿Cómo se llama el software principal de la computadora?", a: ["Navegador", "Sistema Operativo", "Antivirus"], correct: 1 },
-            { q: "¿Qué programa usamos para navegar en internet?", a: ["Google Chrome", "PowerPoint", "Excel"], correct: 0 },
-            { q: "¿Qué extensión suele tener un archivo de imagen?", a: [".docx", ".exe", ".png"], correct: 2 },
-            { q: "¿Qué componente se encarga de procesar los gráficos?", a: ["Tarjeta de Video (GPU)", "Fuente", "Parlantes"], correct: 0 },
-            { q: "¿Qué unidad suministra energía a la PC?", a: ["Batería RAM", "Fuente de Poder", "Monitor"], correct: 1 },
-            { q: "¿Qué tecla se usa para cancelar o salir de un menú?", a: ["Enter", "Esc (Escape)", "Space"], correct: 1 },
-            { q: "¿Qué significa WWW?", a: ["World Wide Web", "Web World Wide", "Wide Web World"], correct: 0 },
-            { q: "¿Qué es un píxel?", a: ["El punto más pequeño de color", "Un tipo de cable", "Un virus"], correct: 0 },
-            { q: "¿Qué programa sirve para crear presentaciones?", a: ["Word", "PowerPoint", "Photoshop"], correct: 1 },
-            { q: "¿Qué significa PDF?", a: ["Portable Document Format", "Public File", "Personal Form"], correct: 0 },
-            { q: "¿Qué es un algoritmo?", a: ["Pasos para resolver un problema", "Un tipo de monitor", "Una red social"], correct: 0 },
-            { q: "¿Qué componente enfría al procesador?", a: ["Ventilador / Disipador", "Teclado", "Carcasa"], correct: 0 },
-            { q: "¿Qué significan las siglas IA?", a: ["Inteligencia Artificial", "Internet Avanzado", "Imagen Automática"], correct: 0 },
-            { q: "¿Cuál es una red social?", a: ["Wikipedia", "Facebook", "Google Search"], correct: 1 },
-            { q: "¿Qué significa SPAM?", a: ["Correo no deseado", "Un juego", "Un tipo de memoria"], correct: 0 },
-            { q: "¿Qué es la 'Nube' (Cloud)?", a: ["Un clima", "Servidores en internet", "Un virus"], correct: 1 },
-            { q: "¿Qué programa es para hojas de cálculo?", a: ["Word", "Excel", "Paint"], correct: 1 },
-            { q: "¿Para qué sirve el puerto HDMI?", a: ["Transmitir audio y video", "Cargar la batería", "Conectar el mouse"], correct: 0 },
-            { q: "¿Qué es un periférico?", a: ["Componente externo de la PC", "Un tipo de procesador", "Un cable interno"], correct: 0 },
-            { q: "¿Cuál es el almacenamiento más veloz?", a: ["Disco HDD", "Unidad SSD", "Cinta Magnética"], correct: 1 },
-            { q: "¿Qué es un Firewall?", a: ["Muro de fuego real", "Software de seguridad", "Un ventilador"], correct: 1 },
-            { q: "¿Qué es el código binario?", a: ["Lenguaje de 0 y 1", "Un juego de azar", "Un tipo de teclado"], correct: 0 },
-            { q: "¿Qué es hardware?", a: ["La parte física de la PC", "Los programas", "Los juegos"], correct: 0 },
-            { q: "¿Qué es software?", a: ["Las piezas de metal", "Los programas e instrucciones", "El monitor"], correct: 1 }
+            { q: "¿Cerebro de la computadora?", a: ["CPU", "RAM", "GPU"], correct: 0 },
+            { q: "¿Almacenamiento permanente?", a: ["RAM", "SSD / HDD", "Pantalla"], correct: 1 },
+            { q: "¿Memoria volátil?", a: ["USB", "CD", "RAM"], correct: 2 },
+            { q: "¿Qué significa USB?", a: ["Universal Serial Bus", "Unit System Boot", "Ultra Bus"], correct: 0 },
+            { q: "¿Periférico de entrada?", a: ["Monitor", "Mouse", "Parlantes"], correct: 1 },
+            { q: "¿A cuántos bits equivale un Byte?", a: ["4", "8", "16"], correct: 1 },
+            { q: "¿Qué es una LAN?", a: ["Red área local", "Una marca", "Un virus"], correct: 0 },
+            { q: "¿Software principal de la PC?", a: ["Google", "Sistema Operativo", "Office"], correct: 1 },
+            { q: "¿Componente para gráficos?", a: ["GPU", "Fuente", "Parlantes"], correct: 0 },
+            { q: "¿Qué significan las siglas IA?", a: ["Inteligencia Artificial", "Internet Avanzado", "Imagen Alta"], correct: 0 }
         ];
 
-        // --- MOTOR ---
+        const OFFICE_PROBLEMS = [
+            { q: "¿En Word, qué combinación es Negrita?", a: ["Ctrl + N", "Ctrl + B", "Ctrl + K"], correct: 0 },
+            { q: "¿Excel: con qué símbolo inicia fórmula?", a: ["+", "=", "$"], correct: 1 },
+            { q: "¿Cómo se llama archivo PowerPoint?", a: ["Documento", "Hoja", "Presentación"], correct: 2 },
+            { q: "¿En Excel, qué es una celda?", a: ["Dibujo", "Fila x Columna", "Letra"], correct: 1 },
+            { q: "¿Cómo se llaman hojas PowerPoint?", a: ["Diapositivas", "Páginas", "Capas"], correct: 0 },
+            { q: "¿Cuál es la extensión de Excel?", a: [".docx", ".xlsx", ".pptx"], correct: 1 },
+            { q: "¿En Excel, qué función suma celdas?", a: ["=TOTAL()", "=SUMA()", "=AÑADIR()"], correct: 1 },
+            { q: "¿En Word, qué es la Sangría?", a: ["Color", "Espacio al inicio", "Borrar"], correct: 1 }
+        ];
+
         function init() {
             if (renderer) {
                 renderer.dispose();
                 if(renderer.domElement.parentNode) document.body.removeChild(renderer.domElement);
             }
-
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0xdbeafe);
-            scene.fog = new THREE.Fog(0xdbeafe, 15, 75);
-            
+            scene.fog = new THREE.Fog(0xdbeafe, 15, 80);
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
-
             scene.add(new THREE.AmbientLight(0xffffff, 0.7));
             const sun = new THREE.DirectionalLight(0xffffff, 0.9);
             sun.position.set(10, 35, 25);
             scene.add(sun);
-
             islandGroup = new THREE.Group();
             scene.add(islandGroup);
             createIsland(islandRadius);
-
             houseGroup = new THREE.Group();
             scene.add(houseGroup);
             updateHouseVisual();
-
             player = new THREE.Group();
             player.add(new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.0, 0.4), new THREE.MeshLambertMaterial({color: 0x2563eb})));
             player.position.set(0, 0.5, 6);
             scene.add(player);
-
+            const arrowGeo = new THREE.ConeGeometry(0.3, 0.8, 4);
+            guidanceArrow = new THREE.Mesh(arrowGeo, new THREE.MeshBasicMaterial({ color: 0xff4444 }));
+            scene.add(guidanceArrow);
             spawnTreasures();
             startTimer(60);
             clock = new THREE.Clock();
-            
             setupEvents();
             gameActive = true;
             animate();
@@ -344,11 +287,6 @@
                         if(k==='arrowup') keys.w = true; if(k==='arrowdown') keys.s = true;
                         if(k==='arrowleft') keys.a = true; if(k==='arrowright') keys.d = true;
                     } else keys[k] = true;
-                    
-                    if(isPlacing && ghostObject) {
-                        if(k === '1') ghostObject.rotation.y += Math.PI/8;
-                        if(k === '2') ghostObject.rotation.y -= Math.PI/8;
-                    }
                 }
             };
             window.onkeyup = (e) => {
@@ -358,16 +296,8 @@
                     if(k==='arrowleft') keys.a = false; if(k==='arrowright') keys.d = false;
                 } else keys[k] = false;
             };
-            window.onwheel = (e) => {
-                if (currentLevel >= 5 && !isPaused) {
-                    camDistance += e.deltaY * 0.01;
-                    camDistance = Math.max(5, Math.min(45, camDistance));
-                }
-            };
-            window.onresize = () => {
-                if (camera) { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); }
-                if (renderer) renderer.setSize(window.innerWidth, window.innerHeight);
-            };
+            window.onwheel = (e) => { if (currentLevel >= 5 && !isPaused) camDistance = Math.max(5, Math.min(50, camDistance + e.deltaY * 0.01)); };
+            window.onresize = () => { if (camera) { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); } if (renderer) renderer.setSize(window.innerWidth, window.innerHeight); };
         }
 
         function createIsland(radius) {
@@ -388,36 +318,22 @@
 
         function updateHouseVisual() {
             houseGroup.clear();
-            for(let i=1; i < currentLevel; i++) {
-                if(i <= 10) houseGroup.add(createHousePart(i, currentStyle));
-            }
-            const cHint = document.getElementById('camera-hint');
-            if(cHint && currentLevel >= 5) cHint.classList.remove('hidden');
-            const fHint = document.getElementById('flight-hint');
-            if(fHint && currentLevel >= 15) fHint.classList.remove('hidden');
+            for(let i=1; i < currentLevel; i++) if(i <= 10) houseGroup.add(createHousePart(i, currentStyle));
+            if(currentLevel >= 5) document.getElementById('camera-hint').classList.remove('hidden');
+            if(currentLevel >= 15) document.getElementById('flight-hint').classList.remove('hidden');
         }
 
         function spawnTreasures() {
             treasures.forEach(t => scene.remove(t.mesh));
-            treasures = [];
-            piecesFound = 0;
+            treasures = []; piecesFound = 0;
             const target = isExpansionMode ? 4 : Math.min(currentLevel + 2, 8);
-            
-            const targetUI = document.getElementById('target-ui');
-            const piecesUI = document.getElementById('pieces-ui');
-            if(targetUI) targetUI.innerText = target;
-            if(piecesUI) piecesUI.innerText = 0;
-
+            document.getElementById('target-ui').innerText = target;
+            document.getElementById('pieces-ui').innerText = 0;
             for(let i = 0; i < target; i++) {
-                const colors = [0x2563eb, 0x1e293b, 0x059669];
-                const model = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.7), new THREE.MeshLambertMaterial({color: colors[i%3]}));
-                const limit = islandRadius - 4;
-                const x = (Math.random() - 0.5) * limit * 2, z = (Math.random() - 0.5) * limit * 2;
-                let y = 0.6;
-                if(currentLevel >= 15) y = Math.random() * 9 + 1; 
-
-                if(Math.abs(x) < 5 && Math.abs(z) < 5 && y < 5) { i--; continue; }
-                
+                const model = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.7), new THREE.MeshLambertMaterial({color: 0x2563eb}));
+                const limit = islandRadius - 5;
+                let x = (Math.random() - 0.5) * limit * 2, z = (Math.random() - 0.5) * limit * 2;
+                let y = (currentLevel >= 15) ? Math.random() * 9 + 1 : 0.6;
                 model.position.set(Math.round(x), y, Math.round(z));
                 scene.add(model);
                 treasures.push({ mesh: model, collected: false });
@@ -427,209 +343,155 @@
         function animate() {
             if(!gameActive) return;
             requestAnimationFrame(animate);
-            
             if (!isPaused) {
                 const delta = clock.getDelta();
                 if(!activeTreasure && !isPlacing) {
                     const speed = 9 * delta;
-                    if(keys.w) { player.position.z -= speed; player.rotation.y = Math.PI; }
-                    if(keys.s) { player.position.z += speed; player.rotation.y = 0; }
-                    if(keys.a) { player.position.x -= speed; player.rotation.y = -Math.PI/2; }
-                    if(keys.d) { player.position.x += speed; player.rotation.y = Math.PI/2; }
-                    
+                    if(keys.w) player.position.z -= speed; if(keys.s) player.position.z += speed;
+                    if(keys.a) player.position.x -= speed; if(keys.d) player.position.x += speed;
+                    if(keys.w || keys.s || keys.a || keys.d) player.rotation.y = Math.atan2(keys.a-keys.d, keys.w-keys.s);
                     if (currentLevel >= 15) {
-                        if (keys.r) player.position.y += speed;
-                        if (keys.f) player.position.y -= speed;
+                        if (keys.r) player.position.y += speed; if (keys.f) player.position.y -= speed;
                         player.position.y = Math.max(0.5, Math.min(15, player.position.y));
-                    } else player.position.y = 0.5;
-
+                    }
                     if (currentLevel >= 5) {
-                        if (keys.q) camHeight += 7 * delta;
-                        if (keys.e) camHeight -= 7 * delta;
+                        if (keys.q) camHeight += 7 * delta; if (keys.e) camHeight -= 7 * delta;
                         camHeight = Math.max(2, Math.min(35, camHeight));
                     }
-
-                    const distH = Math.sqrt(player.position.x**2 + player.position.z**2);
-                    if(distH < 3.8 && player.position.y < 4.5) player.position.multiplyScalar(1.1);
-
-                    const targetCamPos = new THREE.Vector3(player.position.x, player.position.y + camHeight, player.position.z + camDistance);
-                    camera.position.lerp(targetCamPos, 0.1);
+                    camera.position.lerp(new THREE.Vector3(player.position.x, player.position.y + camHeight, player.position.z + camDistance), 0.1);
                     camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
-                    
+                    updateArrow();
                     checkCollisions();
                 }
-
                 if(isPlacing && ghostObject) {
-                    ghostObject.position.set(player.position.x, player.position.y, player.position.z);
-                    camera.lookAt(player.position.x, player.position.y, player.position.z);
+                    ghostObject.position.lerp(player.position, 0.2);
+                    if(keys['1']) ghostObject.rotation.y += 0.05; if(keys['2']) ghostObject.rotation.y -= 0.05;
+                    camera.lookAt(ghostObject.position);
                 }
                 treasures.forEach(t => { if(!t.collected) t.mesh.rotation.y += 0.06; });
             } else clock.getDelta(); 
             renderer.render(scene, camera);
         }
 
+        function updateArrow() {
+            let nearest = null, minDist = Infinity;
+            treasures.forEach(t => { if(!t.collected) { let d = player.position.distanceTo(t.mesh.position); if(d < minDist) { minDist = d; nearest = t; }}});
+            if(nearest) {
+                guidanceArrow.visible = true; guidanceArrow.position.set(player.position.x, player.position.y + 1.8, player.position.z);
+                guidanceArrow.lookAt(nearest.mesh.position); guidanceArrow.rotateX(Math.PI/2);
+            } else guidanceArrow.visible = false;
+        }
+
         function checkCollisions() {
-            treasures.forEach(t => {
-                if(!t.collected && player.position.distanceTo(t.mesh.position) < 1.4) triggerQuiz(t);
-            });
+            treasures.forEach(t => { if(!t.collected && player.position.distanceTo(t.mesh.position) < 1.4) triggerQuiz(t); });
         }
 
         function triggerQuiz(treasure) {
             activeTreasure = treasure;
-            const p = PROBLEMS[Math.floor(Math.random() * PROBLEMS.length)];
-            const qEl = document.getElementById('quiz-question');
+            const isOffice = currentLevel >= 20;
+            const pool = isOffice ? OFFICE_PROBLEMS : PROBLEMS;
+            const p = pool[Math.floor(Math.random() * pool.length)];
+            document.getElementById('quiz-tag').innerText = isOffice ? "RETO OFFICE 365" : "DESAFÍO TÉCNICO";
+            document.getElementById('quiz-question').innerText = p.q;
             const optEl = document.getElementById('quiz-options');
-            const modEl = document.getElementById('quiz-modal');
-            if(!qEl || !optEl || !modEl) return;
-
-            qEl.innerText = p.q;
             optEl.innerHTML = '';
             p.a.forEach((opt, i) => {
                 const b = document.createElement('button');
-                b.className = "w-full bg-slate-50 hover:bg-blue-50 p-3 pixel-border text-left font-bold transition-all transform active:scale-95 text-slate-700";
+                b.className = "w-full bg-slate-50 hover:bg-blue-50 p-3 pixel-border text-left font-bold transition-all transform active:scale-95 interactive text-slate-700";
                 b.innerText = `${String.fromCharCode(65+i)}. ${opt}`;
                 b.onclick = () => checkAnswer(i, p.correct);
                 optEl.appendChild(b);
             });
-            modEl.classList.remove('hidden');
+            document.getElementById('quiz-modal').classList.remove('hidden');
         }
 
         function checkAnswer(sel, cor) {
-            const modal = document.getElementById('quiz-modal');
-            if(modal) modal.classList.add('hidden');
-            
+            document.getElementById('quiz-modal').classList.add('hidden');
             if(sel === cor) {
-                activeTreasure.collected = true;
-                scene.remove(activeTreasure.mesh);
-                piecesFound++;
-                score += 250 + (timeLeft * 3);
-                
-                const pUI = document.getElementById('pieces-ui');
-                const sUI = document.getElementById('score-ui');
-                if(pUI) pUI.innerText = piecesFound;
-                if(sUI) sUI.innerText = score;
-                
-                if(isExpansionMode) enterPlacingMode();
+                activeTreasure.collected = true; scene.remove(activeTreasure.mesh);
+                piecesFound++; score += 300;
+                document.getElementById('pieces-ui').innerText = piecesFound;
+                document.getElementById('score-ui').innerText = score;
+                if(currentLevel >= 20) showObjectSelector();
+                else if(isExpansionMode) enterPlacingModeRandom();
                 else if(piecesFound >= Math.min(currentLevel + 2, 8)) nextLevel();
             } else {
-                timeLeft = Math.max(0, timeLeft - 10);
-                player.position.x += (Math.random()-0.5)*6;
-                updateTimerDisplay();
-                showStatus("¡ ERROR ! -10 SEG", "#f87171");
+                timeLeft -= 10; updateTimerDisplay(); showStatus("¡ ERROR ! -10 SEG", "#f87171");
             }
             activeTreasure = null;
         }
 
-        function enterPlacingMode() {
+        function showObjectSelector() { document.getElementById('object-select-modal').classList.remove('hidden'); }
+        function selectBlueprint(type) { document.getElementById('object-select-modal').classList.add('hidden'); currentBlueprintType = type; startPlacingGhost(); }
+        function enterPlacingModeRandom() { const types = ['tree', 'car', 'bench', 'lamp', 'flower']; currentBlueprintType = types[Math.floor(Math.random() * types.length)]; startPlacingGhost(); }
+        
+        function startPlacingGhost() {
             isPlacing = true;
-            const types = ['tree', 'car', 'bench', 'lamp', 'flower'];
-            currentBlueprintType = types[Math.floor(Math.random() * types.length)];
             ghostObject = createBlueprint(currentBlueprintType, currentStyle);
             ghostObject.traverse(n => { if(n.isMesh) { n.material = n.material.clone(); n.material.transparent = true; n.material.opacity = 0.6; }});
             scene.add(ghostObject);
-            const hint = document.getElementById('build-hint');
-            if(hint) hint.classList.remove('hidden');
-            showStatus("MODO ARQUITECTO: ELIGE POSICIÓN", "#3b82f6");
+            document.getElementById('build-hint').classList.remove('hidden');
+            showStatus("ELIGE DÓNDE COLOCAR", "#3b82f6");
         }
 
         function placeObject() {
             const finalObj = createBlueprint(currentBlueprintType, currentStyle);
-            finalObj.position.copy(ghostObject.position);
-            finalObj.rotation.copy(ghostObject.rotation);
-            scene.add(finalObj);
-            extraObjects.push(finalObj);
-            scene.remove(ghostObject);
-            ghostObject = null;
-            isPlacing = false;
-            const hint = document.getElementById('build-hint');
-            if(hint) hint.classList.add('hidden');
-            
-            if(piecesFound >= 4) { currentLevel++; nextLevelExpansion(); }
+            finalObj.position.copy(ghostObject.position); finalObj.rotation.copy(ghostObject.rotation);
+            scene.add(finalObj); extraObjects.push(finalObj);
+            scene.remove(ghostObject); ghostObject = null; isPlacing = false;
+            document.getElementById('build-hint').classList.add('hidden');
+            if(piecesFound >= (isExpansionMode ? 4 : 8)) { currentLevel++; isExpansionMode ? nextLevelExpansion() : nextLevel(); }
         }
 
         function nextLevel() {
             gameActive = false;
-            if(currentLevel === 10) {
-                const vs = document.getElementById('victory-screen');
-                if(vs) vs.classList.remove('hidden');
-                return;
-            }
+            if(currentLevel === 10) { document.getElementById('victory-screen').classList.remove('hidden'); return; }
             const screen = document.getElementById('level-complete');
-            const uText = document.getElementById('construction-update');
-            if(uText) uText.innerText = "Fase " + currentLevel + " completada";
-            if(screen) screen.classList.remove('hidden');
-            
+            document.getElementById('construction-update').innerText = "Fase " + currentLevel + " completada";
+            screen.classList.remove('hidden');
             setTimeout(() => {
-                const prog = document.getElementById('level-progress');
-                if(prog) prog.style.width = "100%";
+                document.getElementById('level-progress').style.width = "100%";
                 setTimeout(() => {
-                    currentLevel++;
-                    updateHouseVisual();
-                    spawnTreasures();
-                    startTimer(60);
-                    if(screen) screen.classList.add('hidden');
-                    if(prog) prog.style.width = "0%";
-                    const lUI = document.getElementById('level-ui');
-                    if(lUI) lUI.innerText = currentLevel;
-                    gameActive = true; animate();
+                    currentLevel++; updateHouseVisual(); spawnTreasures(); startTimer(60);
+                    screen.classList.add('hidden'); document.getElementById('level-progress').style.width = "0%";
+                    document.getElementById('level-ui').innerText = currentLevel; gameActive = true;
                 }, 1000);
             }, 100);
         }
 
         function continueToExpansion() {
-            const vs = document.getElementById('victory-screen');
-            if(vs) vs.classList.add('hidden');
-            piecesFound = 0;
-            isExpansionMode = true;
-            gameActive = false;
+            const vs = document.getElementById('victory-screen'); vs.classList.add('hidden');
+            piecesFound = 0; isExpansionMode = true; gameActive = false;
             const interval = setInterval(() => {
-                islandRadius += 0.5;
-                createIsland(islandRadius);
-                if(islandRadius >= 38) {
+                islandRadius += 0.5; createIsland(islandRadius);
+                if(islandRadius >= 40) {
                     clearInterval(interval);
-                    const lUI = document.getElementById('level-ui');
-                    if(lUI) lUI.innerText = currentLevel;
-                    const gText = document.getElementById('goal-text');
-                    if(gText) gText.innerHTML = "Planos: <span id='pieces-ui' class='text-orange-500'>0</span> / <span id='target-ui'>4</span>";
-                    updateHouseVisual();
-                    spawnTreasures();
-                    startTimer(90);
-                    gameActive = true; animate();
-                    showStatus("¡ MUNDO EXPANDIDO !", "#1e40af");
+                    document.getElementById('goal-text').innerHTML = "Planos: <span id='pieces-ui' class='text-orange-500'>0</span> / <span id='target-ui'>4</span>";
+                    updateHouseVisual(); spawnTreasures(); startTimer(90);
+                    gameActive = true; showStatus("MUNDO AIVA EXPANDIDO", "#1e40af");
                 }
             }, 25);
         }
 
         function nextLevelExpansion() {
             gameActive = false;
-            const screen = document.getElementById('level-complete');
-            if(screen) screen.classList.remove('hidden');
+            const screen = document.getElementById('level-complete'); screen.classList.remove('hidden');
             setTimeout(() => {
-                const prog = document.getElementById('level-progress');
-                if(prog) prog.style.width = "100%";
+                document.getElementById('level-progress').style.width = "100%";
                 setTimeout(() => {
-                    spawnTreasures();
-                    startTimer(90);
-                    if(screen) screen.classList.add('hidden');
-                    if(prog) prog.style.width = "0%";
-                    const lUI = document.getElementById('level-ui');
-                    if(lUI) lUI.innerText = currentLevel;
-                    gameActive = true; animate();
+                    spawnTreasures(); startTimer(90);
+                    screen.classList.add('hidden'); document.getElementById('level-progress').style.width = "0%";
+                    document.getElementById('level-ui').innerText = currentLevel; gameActive = true;
                 }, 1000);
             }, 100);
         }
 
         function startGame() {
-            const nInput = document.getElementById('player-name');
-            const name = nInput ? nInput.value : "";
-            if(!name) return alert("Por favor, ingresa tu nombre de explorador.");
-            
+            const name = document.getElementById('player-name').value;
+            if(!name) return alert("Ingresa tu nombre");
             currentStyle = HOUSE_STYLES[Math.floor(Math.random() * HOUSE_STYLES.length)];
-            const sUI = document.getElementById('style-ui');
-            const nUI = document.getElementById('display-name');
-            if(sUI) sUI.innerText = currentStyle.name;
-            if(nUI) nUI.innerText = name;
-            
+            document.getElementById('style-ui').innerText = currentStyle.name;
+            document.getElementById('display-name').innerText = name;
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('stats').classList.remove('hidden');
             document.getElementById('timer-box').classList.remove('hidden');
@@ -640,17 +502,43 @@
         }
 
         function togglePause() {
-            if (!gameActive) return;
-            isPaused = !isPaused;
-            const ps = document.getElementById('pause-screen');
+            if (!gameActive) return; isPaused = !isPaused;
+            document.getElementById('pause-screen').classList.toggle('hidden');
             const bp = document.getElementById('btn-pause');
-            if (isPaused) {
-                if(ps) ps.classList.remove('hidden');
-                if(bp) { bp.innerText = "REANUDAR"; bp.classList.replace('bg-yellow-500','bg-green-600'); }
-            } else {
-                if(ps) ps.classList.add('hidden');
-                if(bp) { bp.innerText = "PAUSA"; bp.classList.replace('bg-green-600','bg-yellow-500'); }
-            }
+            bp.innerText = isPaused ? "REANUDAR" : "PAUSA";
+            bp.classList.toggle('bg-yellow-500'); bp.classList.toggle('bg-green-600');
+        }
+
+        function startTimer(sec) {
+            timeLeft = sec; updateTimerDisplay(); clearInterval(timerInterval);
+            timerInterval = setInterval(() => { if(!gameActive || activeTreasure || isPaused || isPlacing) return; timeLeft--; updateTimerDisplay(); if(timeLeft <= 0) { gameActive = false; clearInterval(timerInterval); document.getElementById('game-over').classList.remove('hidden'); }}, 1000);
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('timer-ui').innerText = `00:${timeLeft < 10 ? '0'+timeLeft : timeLeft}`;
+            const b = document.getElementById('timer-box');
+            timeLeft < 10 ? b.classList.add('timer-warning') : b.classList.remove('timer-warning');
+        }
+
+        function retryContinue() { document.getElementById('game-over').classList.add('hidden'); gameActive = true; startTimer(40); animate(); }
+        
+        function downloadWallpaper() {
+            const name = document.getElementById('player-name').value.toUpperCase();
+            const tr = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+            tr.setSize(1920, 1080);
+            const tc = camera.clone(); tc.aspect = 1920/1080; tc.updateProjectionMatrix();
+            tc.position.set(22, 16, 22); tc.lookAt(0, 1, 0);
+            tr.render(scene, tc);
+            const cv = document.createElement('canvas'); cv.width = 1920; cv.height = 1080;
+            const cx = cv.getContext('2d'); cx.drawImage(tr.domElement, 0, 0);
+            cx.fillStyle = 'rgba(15, 23, 42, 0.9)'; cx.fillRect(40, 780, 700, 260);
+            cx.fillStyle = '#2563eb'; cx.fillRect(40, 780, 700, 8);
+            cx.textAlign = 'left'; cx.shadowColor = "black"; cx.shadowBlur = 5;
+            cx.fillStyle = '#60a5fa'; cx.font = 'bold 24px Arial'; cx.fillText("PROYECTO: AIVA ACADEMIA", 70, 830);
+            cx.fillStyle = '#ffffff'; cx.font = 'black 80px Arial'; cx.fillText(name, 70, 910);
+            cx.font = 'bold 36px Arial'; cx.fillStyle = '#ffd700'; cx.fillText(`MAESTRO CONSTRUCTOR | NIVEL: ${currentLevel}`, 70, 960);
+            cx.font = 'bold 42px Arial'; cx.fillStyle = '#4ade80'; cx.fillText(`PUNTAJE LOGRADO: ${score}`, 70, 1010);
+            const link = document.createElement('a'); link.download = `AIVA_Quest_${name}.jpg`; link.href = cv.toDataURL('image/jpeg', 0.95); link.click(); tr.dispose();
         }
 
         function showInstructions() { document.getElementById('instructions-modal').classList.remove('hidden'); }
@@ -658,175 +546,32 @@
         function showExitConfirm() { isPaused = true; document.getElementById('exit-confirm-modal').classList.remove('hidden'); }
         function hideExitConfirm() { isPaused = false; document.getElementById('exit-confirm-modal').classList.add('hidden'); }
         function confirmExit() { location.reload(); }
+        function showStatus(t, c) { const m = document.getElementById('status-msg'); m.innerText = t; m.style.backgroundColor = c; m.classList.remove('hidden'); setTimeout(() => m.classList.add('hidden'), 3000); }
 
-        function startTimer(sec) {
-            timeLeft = sec;
-            updateTimerDisplay();
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if(!gameActive || activeTreasure || isPaused || isPlacing) return;
-                timeLeft--;
-                updateTimerDisplay();
-                if(timeLeft <= 0) { 
-                    gameActive = false; 
-                    clearInterval(timerInterval); 
-                    const go = document.getElementById('game-over');
-                    if(go) go.classList.remove('hidden'); 
-                }
-            }, 1000);
+        function createHousePart(l, s) {
+            const g = new THREE.Group(); const c = s.colors;
+            const mat = (col) => new THREE.MeshLambertMaterial({color: col});
+            if(l===1) g.add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.4, 4.2), mat(c.stone))).position.y=0.2;
+            if(l===2 || l===3) g.add(new THREE.Mesh(new THREE.BoxGeometry(3.8, 1, 3.8), mat(c.wall))).position.y = l===2 ? 0.7 : 1.7;
+            if(l===4) g.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.4, 0.15), mat(c.wood))).position.set(0, 0.7, 1.9);
+            if(l===5 || l===6) g.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), mat(c.glass, true))).position.set(l===5?1.2:-1.2, 1.6, 1.9);
+            if(l===7) g.add(new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.2, 4.6), mat(c.wood))).position.y = 2.2;
+            if(l===8) g.add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 1.4, 4.2), mat(c.roof))).position.y = 3.0;
+            if(l===9) g.add(new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.8, 0.6), mat(c.stone))).position.set(1, 3.8, 0);
+            if(l===10) g.add(new THREE.Mesh(new THREE.BoxGeometry(7, 0.1, 7), mat(0x1e3a8a))).position.y = 0.05;
+            return g;
         }
 
-        function updateTimerDisplay() {
-            const tUI = document.getElementById('timer-ui');
-            if(tUI) tUI.innerText = `00:${timeLeft < 10 ? '0'+timeLeft : timeLeft}`;
-            const b = document.getElementById('timer-box');
-            if(b) {
-                if(timeLeft < 10) b.classList.add('timer-warning'); else b.classList.remove('timer-warning');
-            }
-        }
-
-        function retryContinue() {
-            document.getElementById('game-over').classList.add('hidden');
-            gameActive = true;
-            startTimer(40); animate();
-        }
-
-        function showStatus(txt, col) {
-            const m = document.getElementById('status-msg');
-            if(!m) return;
-            m.innerText = txt; m.style.backgroundColor = col;
-            m.classList.remove('hidden');
-            setTimeout(() => m.classList.add('hidden'), 3000);
-        }
-
-        function downloadWallpaper() {
-            const nInput = document.getElementById('player-name');
-            const name = (nInput && nInput.value ? nInput.value : "Explorador").toUpperCase();
-            
-            // 1. Renderizado a alta resolución
-            const tRenderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-            tRenderer.setSize(1920, 1080);
-            const tCamera = camera.clone();
-            tCamera.aspect = 1920 / 1080;
-            tCamera.updateProjectionMatrix();
-            
-            // Posicionar cámara para que la isla ocupe gran parte de la pantalla
-            // Miramos al centro (0,0,0) desde una diagonal épica
-            tCamera.position.set(22, 16, 22);
-            tCamera.lookAt(0, 1, 0);
-            
-            tRenderer.render(scene, tCamera);
-            
-            const canv = document.createElement('canvas');
-            canv.width = 1920; canv.height = 1080;
-            const ctx = canv.getContext('2d');
-            ctx.drawImage(tRenderer.domElement, 0, 0);
-            
-            // 2. Nueva Tarjeta de Información en la Esquina (Inferior Izquierda)
-            // Fondo de la tarjeta
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
-            ctx.fillRect(40, 780, 700, 260);
-            // Borde superior de color AIVA
-            ctx.fillStyle = '#2563eb';
-            ctx.fillRect(40, 780, 700, 8);
-            
-            ctx.textAlign = 'left';
-            ctx.shadowColor = "black"; ctx.shadowBlur = 5;
-            
-            // Título Academia
-            ctx.fillStyle = '#60a5fa';
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText("PROYECTO: AIVA ACADEMIA", 70, 830);
-            
-            // Nombre del Alumno
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'black 80px Arial';
-            ctx.fillText(name, 70, 910);
-            
-            // Datos del Juego
-            ctx.font = 'bold 36px Arial';
-            ctx.fillStyle = '#ffd700';
-            ctx.fillText(`MAESTRO CONSTRUCTOR | NIVEL: ${currentLevel}`, 70, 960);
-            
-            ctx.font = 'bold 42px Arial';
-            ctx.fillStyle = '#4ade80';
-            ctx.fillText(`PUNTAJE LOGRADO: ${score}`, 70, 1010);
-            
-            // Sello de la Academia en la otra esquina
-            ctx.textAlign = 'right';
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.font = 'bold 20px Arial';
-            ctx.fillText("CERTIFICADO DE HABILIDADES TECNOLÓGICAS", 1880, 1040);
-            
-            const link = document.createElement('a');
-            link.download = `AIVA_Voxel_Quest_${name}.jpg`;
-            link.href = canv.toDataURL('image/jpeg', 0.95);
-            link.click();
-            tRenderer.dispose();
-        }
-
-        // --- MODELADO DE CASA ---
-        function createHousePart(level, style) {
-            const group = new THREE.Group();
-            const c = style.colors;
-            const mS = new THREE.MeshLambertMaterial({ color: c.stone });
-            const mW = new THREE.MeshLambertMaterial({ color: c.wood });
-            const mA = new THREE.MeshLambertMaterial({ color: c.wall });
-            const mR = new THREE.MeshLambertMaterial({ color: c.roof });
-            const mG = new THREE.MeshLambertMaterial({ color: c.glass, transparent: true, opacity: 0.7 });
-
-            switch(level) {
-                case 1: group.add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.4, 4.2), mS)).position.y = 0.2; break;
-                case 2: group.add(new THREE.Mesh(new THREE.BoxGeometry(3.8, 1, 3.8), mA)).position.y = 0.7; break;
-                case 3: group.add(new THREE.Mesh(new THREE.BoxGeometry(3.8, 1, 3.8), mA)).position.y = 1.7; break;
-                case 4: group.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.4, 0.15), mW)).position.set(0, 0.7, 1.9); break;
-                case 5: group.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), mG)).position.set(1.2, 1.6, 1.9); break;
-                case 6: group.add(new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.1), mG)).position.set(-1.2, 1.6, 1.9); break;
-                case 7: group.add(new THREE.Mesh(new THREE.BoxGeometry(4.6, 0.2, 4.6), mW)).position.y = 2.2; break;
-                case 8: group.add(new THREE.Mesh(new THREE.BoxGeometry(4.2, 1.4, 4.2), mR)).position.y = 3.0; break;
-                case 9: group.add(new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.8, 0.6), mS)).position.set(1, 3.8, 0); break;
-                case 10: group.add(new THREE.Mesh(new THREE.BoxGeometry(7, 0.1, 7), new THREE.MeshLambertMaterial({color: 0x1e3a8a}))).position.y = 0.05; break;
-            }
-            return group;
-        }
-
-        // --- BLUEPRINTS ---
-        function createBlueprint(type, style) {
-            const group = new THREE.Group();
-            const c = style.colors;
-            switch(type) {
-                case 'tree':
-                    const trunk = new THREE.Mesh(new THREE.BoxGeometry(0.4, 2, 0.4), new THREE.MeshLambertMaterial({color: c.wood}));
-                    trunk.position.y = 1; group.add(trunk);
-                    const foliage = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6), new THREE.MeshLambertMaterial({color: c.leaf}));
-                    foliage.position.y = 2.4; group.add(foliage);
-                    break;
-                case 'car':
-                    const carBody = new THREE.Mesh(new THREE.BoxGeometry(2, 0.7, 1.2), new THREE.MeshLambertMaterial({color: c.car}));
-                    carBody.position.y = 0.5; group.add(carBody);
-                    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.5, 1), new THREE.MeshLambertMaterial({color: c.glass, transparent: true, opacity: 0.6}));
-                    cabin.position.set(-0.2, 1, 0); group.add(cabin);
-                    break;
-                case 'bench':
-                    const seat = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.6), new THREE.MeshLambertMaterial({color: c.wood}));
-                    seat.position.y = 0.4; group.add(seat);
-                    const legs = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.4, 0.5), new THREE.MeshLambertMaterial({color: c.stone}));
-                    legs.position.y = 0.2; group.add(legs);
-                    break;
-                case 'lamp':
-                    const pole = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 0.2), new THREE.MeshLambertMaterial({color: 0x333333}));
-                    pole.position.y = 1.25; group.add(pole);
-                    const head = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.3, 0.6), new THREE.MeshLambertMaterial({color: 0xffffaa}));
-                    head.position.y = 2.5; group.add(head);
-                    break;
-                case 'flower':
-                    const stem = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.5, 0.1), new THREE.MeshLambertMaterial({color: 0x228b22}));
-                    stem.position.y = 0.25; group.add(stem);
-                    const petal = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.1, 0.4), new THREE.MeshLambertMaterial({color: c.flower}));
-                    petal.position.y = 0.5; group.add(petal);
-                    break;
-            }
-            return group;
+        function createBlueprint(t, s) {
+            const g = new THREE.Group(); const c = s.colors;
+            const mat = (col) => new THREE.MeshLambertMaterial({color: col});
+            if(t==='tree') { g.add(new THREE.Mesh(new THREE.BoxGeometry(0.4, 2, 0.4), mat(c.wood))).position.y=1; g.add(new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6), mat(c.leaf))).position.y=2.4; }
+            if(t==='car') { g.add(new THREE.Mesh(new THREE.BoxGeometry(2, 0.7, 1.2), mat(c.car))).position.y=0.5; g.add(new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.5, 1), mat(c.glass))).position.set(-0.2, 1, 0); }
+            if(t==='bench') { g.add(new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.6), mat(c.wood))).position.y=0.4; g.add(new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.4, 0.5), mat(c.stone))).position.y=0.2; }
+            if(t==='lamp') { g.add(new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 0.2), mat(0x333333))).position.y=1.25; g.add(new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.3, 0.6), mat(0xffffaa))).position.y=2.5; }
+            if(t==='flower') { g.add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.5, 0.1), mat(0x228b22))).position.y=0.25; g.add(new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.1, 0.4), mat(c.flower))).position.y=0.5; }
+            if(t==='cloud') { for(let i=0; i<5; i++) { let b = new THREE.Mesh(new THREE.BoxGeometry(1, 0.6, 0.8), mat(c.cloud)); b.position.set(Math.random()*1.5-0.7, Math.random()*0.5, Math.random()*1.5-0.7); g.add(b); } }
+            return g;
         }
     </script>
 </body>
