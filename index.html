@@ -49,7 +49,7 @@
             <h1 class="text-4xl font-black mb-2 text-blue-800 uppercase leading-none">VOXEL QUEST</h1>
             <p class="text-xs font-bold text-orange-500 mb-6 border-y-2 border-orange-100 py-1 uppercase tracking-widest">Constructor Tecnológico</p>
             
-            <input type="text" id="player-name" placeholder="Tu nombre..." 
+            <input type="text" id="player-name" placeholder="Escribe tu nombre..." 
                 class="w-full p-3 border-4 border-black mb-6 focus:outline-none focus:border-blue-500 font-bold text-center uppercase">
             
             <div class="flex flex-col gap-3">
@@ -73,7 +73,7 @@
                     <p>Usa las <b>Flechas</b> o <b>WASD</b> para moverte por la isla.</p>
                 </section>
                 <section class="bg-slate-50 p-3 border-l-4 border-orange-500 text-left">
-                    <h3 class="font-bold text-orange-500 uppercase mb-1">🎥 Cámara (Nivel 5+)</h3>
+                    <h3 class="font-bold text-orange-500 uppercase mb-1">🎥 Vista (Nivel 5+)</h3>
                     <p><b>Rueda del Mouse:</b> Zoom.<br><b>Teclas Q / E:</b> Cambia la altura de la cámara.</p>
                 </section>
                 <section class="bg-slate-50 p-3 border-l-4 border-green-500 text-left">
@@ -108,6 +108,8 @@
                     <p class="font-bold text-xs uppercase text-gray-500">Score: <span id="score-ui" class="text-green-600 text-sm font-black">0</span></p>
                     <p class="font-bold text-xs uppercase text-gray-500 col-span-2 mt-1" id="goal-text">Objetivo: <span id="pieces-ui" class="text-orange-500 text-sm">0</span>/<span id="target-ui">3</span></p>
                 </div>
+                <!-- Reincorporado style-ui para evitar error de null -->
+                <p class="text-[9px] font-bold mt-2 text-slate-400 tracking-[0.2em] uppercase border-t pt-1 italic">ESTILO: <span id="style-ui" class="text-blue-500 font-normal">NORMAL</span></p>
             </div>
 
             <div class="flex flex-col gap-2 items-end pointer-events-auto">
@@ -117,10 +119,10 @@
                 </div>
                 
                 <div class="flex gap-2">
-                    <button onclick="showInstructions()" id="btn-info" class="hidden bg-blue-600 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-blue-700 interactive">
+                    <button onclick="showInstructions()" id="btn-info" class="hidden bg-blue-600 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-blue-700 interactive shadow-md">
                         INFO
                     </button>
-                    <button onclick="togglePause()" id="btn-pause" class="hidden bg-yellow-500 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-yellow-600 interactive">
+                    <button onclick="togglePause()" id="btn-pause" class="hidden bg-yellow-500 text-white px-3 py-2 pixel-border font-bold text-xs hover:bg-yellow-600 interactive shadow-md">
                         PAUSA
                     </button>
                     <button onclick="showExitConfirm()" class="bg-red-500 text-white p-2 pixel-border font-bold text-xs hover:bg-red-600 hidden interactive shadow-md" id="btn-exit">
@@ -128,9 +130,9 @@
                     </button>
                 </div>
 
-                <div id="camera-hint" class="hidden bg-blue-500 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">CÁMARA: RUEDA (ZOOM) | Q-E (ALTURA)</div>
-                <div id="build-hint" class="hidden bg-green-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">CONSTRUCCIÓN: ESPACIO (PONER) | 1-2 (GIRAR)</div>
-                <div id="flight-hint" class="hidden bg-purple-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md">VUELO: R (SUBIR) | F (BAJAR)</div>
+                <div id="camera-hint" class="hidden bg-blue-500 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter">CÁMARA: RUEDA (ZOOM) | Q-E (ALTURA)</div>
+                <div id="build-hint" class="hidden bg-green-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter">CONSTRUCCIÓN: ESPACIO (PONER) | 1-2 (GIRAR)</div>
+                <div id="flight-hint" class="hidden bg-purple-600 text-white p-2 pixel-border text-[9px] font-bold text-center hint-anim shadow-md uppercase tracking-tighter">VUELO: R (SUBIR) | F (BAJAR)</div>
             </div>
         </div>
 
@@ -138,7 +140,7 @@
         <div id="object-select-modal" class="hidden fixed inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-[80] p-4">
             <div class="bg-white p-6 pixel-border max-w-lg w-full interactive border-t-8 border-green-500 text-center shadow-2xl">
                 <h2 class="text-2xl font-black text-green-700 mb-4 uppercase">ELIGE TU RECOMPENSA</h2>
-                <p class="text-sm text-slate-500 mb-6 font-bold uppercase tracking-tight">¡Has superado el reto Office! Selecciona qué construir:</p>
+                <p class="text-sm text-slate-500 mb-6 font-bold uppercase tracking-tight">¡Has superado el reto Office! Selecciona qué quieres construir:</p>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
                     <button onclick="selectBlueprint('tree')" class="p-4 bg-slate-100 hover:bg-green-100 pixel-border font-bold text-xs uppercase interactive transition-colors">🌳 Árbol</button>
                     <button onclick="selectBlueprint('car')" class="p-4 bg-slate-100 hover:bg-blue-100 pixel-border font-bold text-xs uppercase interactive transition-colors">🚗 Auto</button>
@@ -176,21 +178,31 @@
                 <div class="flex flex-col gap-3">
                     <button onclick="downloadWallpaper()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 flex items-center justify-center gap-2 interactive">💾 DESCARGAR FOTO FINAL</button>
                     <div class="h-px bg-slate-200 my-4"></div>
-                    <button onclick="hideExitConfirm()" class="w-full bg-green-500 text-white font-bold py-3 px-6 pixel-border interactive">CONTINUAR JUGANDO</button>
+                    <button onclick="hideExitConfirm()" class="w-full bg-green-500 text-white font-bold py-3 px-6 pixel-border interactive transition-colors">CONTINUAR JUGANDO</button>
                     <button onclick="confirmExit()" class="w-full text-slate-400 font-bold py-2 px-6 text-xs hover:text-red-500 uppercase interactive">Salir sin guardar</button>
                 </div>
             </div>
         </div>
 
         <!-- Game Over -->
-        <div id="game-over" class="hidden absolute inset-0 flex items-center justify-center bg-red-950 bg-opacity-95 z-[90] p-4 text-white text-center">
-            <div class="bg-white p-8 pixel-border max-w-sm w-full interactive border-t-8 border-red-600 shadow-2xl">
+        <div id="game-over" class="hidden absolute inset-0 flex items-center justify-center bg-red-950 bg-opacity-95 z-[130] p-4 text-white text-center">
+            <div class="bg-white p-8 pixel-border max-w-sm w-full interactive border-t-8 border-red-600 shadow-2xl text-black">
                 <h1 class="text-3xl font-black text-red-600 mb-2 uppercase leading-none">Energía Agotada</h1>
                 <p class="mb-8 text-slate-600 font-bold text-sm tracking-tight">¿Necesitas recargar el sistema para completar tu villa de AIVA?</p>
                 <div class="flex flex-col gap-3">
-                    <button onclick="retryContinue()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 transition-colors interactive">RECARGAR (+40 SEG)</button>
-                    <button onclick="downloadWallpaper()" class="w-full bg-slate-100 text-slate-700 font-bold py-3 px-6 pixel-border w-full text-xs transition-colors interactive">GUARDAR FOTO ACTUAL</button>
+                    <button onclick="retryContinue()" class="w-full bg-blue-600 text-white font-bold py-4 px-6 pixel-border hover:bg-blue-700 transition-colors interactive shadow-md">RECARGAR (+40 SEG)</button>
+                    <button onclick="downloadWallpaper()" class="w-full bg-slate-100 text-slate-700 font-bold py-3 px-6 pixel-border w-full text-xs transition-colors interactive shadow-sm">GUARDAR FOTO ACTUAL</button>
                     <button onclick="confirmExit()" class="w-full text-slate-400 py-2 text-[10px] uppercase hover:text-red-500 interactive">Reiniciar misión</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="level-complete" class="hidden absolute inset-0 flex items-center justify-center bg-blue-900 bg-opacity-90 z-50 p-4">
+            <div class="text-center text-white">
+                <h1 class="text-6xl font-black mb-4 italic tracking-tighter text-blue-300 uppercase">¡Nivel Logrado!</h1>
+                <p class="text-xl mb-10 font-bold uppercase tracking-widest" id="construction-update">Actualizando Arquitectura...</p>
+                <div class="w-80 bg-slate-800 h-6 pixel-border mx-auto overflow-hidden">
+                    <div id="level-progress" class="bg-blue-400 h-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
         </div>
@@ -214,13 +226,14 @@
 
         const HOUSE_STYLES = [
             { name: "CIUDAD AIVA", colors: { stone: 0x888888, wood: 0x8b4513, wall: 0xeeeeee, roof: 0x2563eb, glass: 0xbfdbfe, car: 0x1e40af, leaf: 0x16a34a, flower: 0xec4899, cloud: 0xffffff } },
-            { name: "LABORATORIO", colors: { stone: 0x334155, wood: 0x1e293b, wall: 0x94a3b8, roof: 0x0ea5e9, glass: 0xffffff, car: 0x64748b, leaf: 0x22c55e, flower: 0xef4444, cloud: 0xe2e8f0 } }
+            { name: "LABORATORIO", colors: { stone: 0x334155, wood: 0x1e293b, wall: 0x94a3b8, roof: 0x0ea5e9, glass: 0xffffff, car: 0x64748b, leaf: 0x22c55e, flower: 0xef4444, cloud: 0xe2e8f0 } },
+            { name: "VILLA TECH", colors: { stone: 0x555555, wood: 0x5d4037, wall: 0xd1d5db, roof: 0x059669, glass: 0x93c5fd, car: 0x475569, leaf: 0x064e3b, flower: 0xfde047, cloud: 0xffffff } }
         ];
 
         const PROBLEMS = [
             { q: "¿Cerebro de la computadora?", a: ["CPU", "RAM", "GPU"], correct: 0 },
             { q: "¿Almacenamiento permanente?", a: ["RAM", "SSD / HDD", "Pantalla"], correct: 1 },
-            { q: "¿Memoria volátil?", a: ["USB", "CD", "RAM"], correct: 2 },
+            { q: "¿Memoria volátil?", a: ["USB", "CD", "Memoria RAM"], correct: 2 },
             { q: "¿Qué significa USB?", a: ["Universal Serial Bus", "Unit System Boot", "Ultra Bus"], correct: 0 },
             { q: "¿Periférico de entrada?", a: ["Monitor", "Mouse", "Parlantes"], correct: 1 },
             { q: "¿A cuántos bits equivale un Byte?", a: ["4", "8", "16"], correct: 1 },
@@ -238,7 +251,9 @@
             { q: "¿Cómo se llaman hojas PowerPoint?", a: ["Diapositivas", "Páginas", "Capas"], correct: 0 },
             { q: "¿Cuál es la extensión de Excel?", a: [".docx", ".xlsx", ".pptx"], correct: 1 },
             { q: "¿En Excel, qué función suma celdas?", a: ["=TOTAL()", "=SUMA()", "=AÑADIR()"], correct: 1 },
-            { q: "¿En Word, qué es la Sangría?", a: ["Color", "Espacio al inicio", "Borrar"], correct: 1 }
+            { q: "¿En Word, qué es la Sangría?", a: ["Color", "Espacio al inicio", "Borrar"], correct: 1 },
+            { q: "¿En PowerPoint, qué tecla inicia presentación?", a: ["F1", "F5", "Esc"], correct: 1 },
+            { q: "¿En Word, qué comando alinea bordes?", a: ["Centrar", "Justificar", "Sangría"], correct: 1 }
         ];
 
         function init() {
@@ -319,16 +334,16 @@
         function updateHouseVisual() {
             houseGroup.clear();
             for(let i=1; i < currentLevel; i++) if(i <= 10) houseGroup.add(createHousePart(i, currentStyle));
-            if(currentLevel >= 5) document.getElementById('camera-hint').classList.remove('hidden');
-            if(currentLevel >= 15) document.getElementById('flight-hint').classList.remove('hidden');
+            const camH = document.getElementById('camera-hint'); if(camH && currentLevel >= 5) camH.classList.remove('hidden');
+            const fliH = document.getElementById('flight-hint'); if(fliH && currentLevel >= 15) fliH.classList.remove('hidden');
         }
 
         function spawnTreasures() {
             treasures.forEach(t => scene.remove(t.mesh));
             treasures = []; piecesFound = 0;
             const target = isExpansionMode ? 4 : Math.min(currentLevel + 2, 8);
-            document.getElementById('target-ui').innerText = target;
-            document.getElementById('pieces-ui').innerText = 0;
+            const tUI = document.getElementById('target-ui'); if(tUI) tUI.innerText = target;
+            const pUI = document.getElementById('pieces-ui'); if(pUI) pUI.innerText = 0;
             for(let i = 0; i < target; i++) {
                 const model = new THREE.Mesh(new THREE.BoxGeometry(0.7,0.7,0.7), new THREE.MeshLambertMaterial({color: 0x2563eb}));
                 const limit = islandRadius - 5;
@@ -378,7 +393,7 @@
             treasures.forEach(t => { if(!t.collected) { let d = player.position.distanceTo(t.mesh.position); if(d < minDist) { minDist = d; nearest = t; }}});
             if(nearest) {
                 guidanceArrow.visible = true; guidanceArrow.position.set(player.position.x, player.position.y + 1.8, player.position.z);
-                guidanceArrow.lookAt(nearest.mesh.position); guidanceArrow.rotateX(Math.PI/2);
+                guidanceArrow.lookAt(nearest.mesh.position); guidanceArrow.rotateX(-Math.PI/2);
             } else guidanceArrow.visible = false;
         }
 
@@ -391,27 +406,28 @@
             const isOffice = currentLevel >= 20;
             const pool = isOffice ? OFFICE_PROBLEMS : PROBLEMS;
             const p = pool[Math.floor(Math.random() * pool.length)];
-            document.getElementById('quiz-tag').innerText = isOffice ? "RETO OFFICE 365" : "DESAFÍO TÉCNICO";
-            document.getElementById('quiz-question').innerText = p.q;
-            const optEl = document.getElementById('quiz-options');
-            optEl.innerHTML = '';
-            p.a.forEach((opt, i) => {
-                const b = document.createElement('button');
-                b.className = "w-full bg-slate-50 hover:bg-blue-50 p-3 pixel-border text-left font-bold transition-all transform active:scale-95 interactive text-slate-700";
-                b.innerText = `${String.fromCharCode(65+i)}. ${opt}`;
-                b.onclick = () => checkAnswer(i, p.correct);
-                optEl.appendChild(b);
-            });
-            document.getElementById('quiz-modal').classList.remove('hidden');
+            const tTag = document.getElementById('quiz-tag'); if(tTag) tTag.innerText = isOffice ? "RETO OFFICE MASTER" : "DESAFÍO AIVA";
+            const qEl = document.getElementById('quiz-question'); if(qEl) qEl.innerText = p.q;
+            const optEl = document.getElementById('quiz-options'); if(optEl) {
+                optEl.innerHTML = '';
+                p.a.forEach((opt, i) => {
+                    const b = document.createElement('button');
+                    b.className = "w-full bg-slate-50 hover:bg-blue-50 p-3 pixel-border text-left font-bold transition-all transform active:scale-95 interactive text-slate-700 shadow-sm";
+                    b.innerText = `${String.fromCharCode(65+i)}. ${opt}`;
+                    b.onclick = () => checkAnswer(i, p.correct);
+                    optEl.appendChild(b);
+                });
+            }
+            const modal = document.getElementById('quiz-modal'); if(modal) modal.classList.remove('hidden');
         }
 
         function checkAnswer(sel, cor) {
-            document.getElementById('quiz-modal').classList.add('hidden');
+            const modal = document.getElementById('quiz-modal'); if(modal) modal.classList.add('hidden');
             if(sel === cor) {
                 activeTreasure.collected = true; scene.remove(activeTreasure.mesh);
                 piecesFound++; score += 300;
-                document.getElementById('pieces-ui').innerText = piecesFound;
-                document.getElementById('score-ui').innerText = score;
+                const pUI = document.getElementById('pieces-ui'); if(pUI) pUI.innerText = piecesFound;
+                const sUI = document.getElementById('score-ui'); if(sUI) sUI.innerText = score;
                 if(currentLevel >= 20) showObjectSelector();
                 else if(isExpansionMode) enterPlacingModeRandom();
                 else if(piecesFound >= Math.min(currentLevel + 2, 8)) nextLevel();
@@ -430,8 +446,8 @@
             ghostObject = createBlueprint(currentBlueprintType, currentStyle);
             ghostObject.traverse(n => { if(n.isMesh) { n.material = n.material.clone(); n.material.transparent = true; n.material.opacity = 0.6; }});
             scene.add(ghostObject);
-            document.getElementById('build-hint').classList.remove('hidden');
-            showStatus("ELIGE DÓNDE COLOCAR", "#3b82f6");
+            const bH = document.getElementById('build-hint'); if(bH) bH.classList.remove('hidden');
+            showStatus("UBICA TU RECOMPENSA", "#3b82f6");
         }
 
         function placeObject() {
@@ -439,59 +455,63 @@
             finalObj.position.copy(ghostObject.position); finalObj.rotation.copy(ghostObject.rotation);
             scene.add(finalObj); extraObjects.push(finalObj);
             scene.remove(ghostObject); ghostObject = null; isPlacing = false;
-            document.getElementById('build-hint').classList.add('hidden');
+            const bH = document.getElementById('build-hint'); if(bH) bH.classList.add('hidden');
             if(piecesFound >= (isExpansionMode ? 4 : 8)) { currentLevel++; isExpansionMode ? nextLevelExpansion() : nextLevel(); }
         }
 
         function nextLevel() {
             gameActive = false;
-            if(currentLevel === 10) { document.getElementById('victory-screen').classList.remove('hidden'); return; }
+            if(currentLevel === 10) { const vs = document.getElementById('victory-screen'); if(vs) vs.classList.remove('hidden'); return; }
             const screen = document.getElementById('level-complete');
-            document.getElementById('construction-update').innerText = "Fase " + currentLevel + " completada";
-            screen.classList.remove('hidden');
+            const uT = document.getElementById('construction-update'); if(uT) uT.innerText = "Fase " + currentLevel + " completada";
+            if(screen) screen.classList.remove('hidden');
             setTimeout(() => {
-                document.getElementById('level-progress').style.width = "100%";
+                const prog = document.getElementById('level-progress'); if(prog) prog.style.width = "100%";
                 setTimeout(() => {
                     currentLevel++; updateHouseVisual(); spawnTreasures(); startTimer(60);
-                    screen.classList.add('hidden'); document.getElementById('level-progress').style.width = "0%";
-                    document.getElementById('level-ui').innerText = currentLevel; gameActive = true;
+                    if(screen) screen.classList.add('hidden'); if(prog) prog.style.width = "0%";
+                    const lUI = document.getElementById('level-ui'); if(lUI) lUI.innerText = currentLevel;
+                    gameActive = true; animate();
                 }, 1000);
             }, 100);
         }
 
         function continueToExpansion() {
-            const vs = document.getElementById('victory-screen'); vs.classList.add('hidden');
+            const vs = document.getElementById('victory-screen'); if(vs) vs.classList.add('hidden');
             piecesFound = 0; isExpansionMode = true; gameActive = false;
             const interval = setInterval(() => {
                 islandRadius += 0.5; createIsland(islandRadius);
                 if(islandRadius >= 40) {
                     clearInterval(interval);
-                    document.getElementById('goal-text').innerHTML = "Planos: <span id='pieces-ui' class='text-orange-500'>0</span> / <span id='target-ui'>4</span>";
+                    const lUI = document.getElementById('level-ui'); if(lUI) lUI.innerText = currentLevel;
+                    const gT = document.getElementById('goal-text'); if(gT) gT.innerHTML = "Planos: <span id='pieces-ui'>0</span> / <span id='target-ui'>4</span>";
                     updateHouseVisual(); spawnTreasures(); startTimer(90);
-                    gameActive = true; showStatus("MUNDO AIVA EXPANDIDO", "#1e40af");
+                    gameActive = true; animate(); showStatus("MUNDO EXPANDIDO", "#1e40af");
                 }
             }, 25);
         }
 
         function nextLevelExpansion() {
             gameActive = false;
-            const screen = document.getElementById('level-complete'); screen.classList.remove('hidden');
+            const screen = document.getElementById('level-complete'); if(screen) screen.classList.remove('hidden');
             setTimeout(() => {
-                document.getElementById('level-progress').style.width = "100%";
+                const prog = document.getElementById('level-progress'); if(prog) prog.style.width = "100%";
                 setTimeout(() => {
                     spawnTreasures(); startTimer(90);
-                    screen.classList.add('hidden'); document.getElementById('level-progress').style.width = "0%";
-                    document.getElementById('level-ui').innerText = currentLevel; gameActive = true;
+                    if(screen) screen.classList.add('hidden'); if(prog) prog.style.width = "0%";
+                    const lUI = document.getElementById('level-ui'); if(lUI) lUI.innerText = currentLevel;
+                    gameActive = true; animate();
                 }, 1000);
             }, 100);
         }
 
         function startGame() {
-            const name = document.getElementById('player-name').value;
-            if(!name) return alert("Ingresa tu nombre");
+            const nInput = document.getElementById('player-name');
+            const name = nInput ? nInput.value : "";
+            if(!name) return alert("Por favor, ingresa tu nombre de explorador.");
             currentStyle = HOUSE_STYLES[Math.floor(Math.random() * HOUSE_STYLES.length)];
-            document.getElementById('style-ui').innerText = currentStyle.name;
-            document.getElementById('display-name').innerText = name;
+            const sUI = document.getElementById('style-ui'); if(sUI) sUI.innerText = currentStyle.name;
+            const dUI = document.getElementById('display-name'); if(dUI) dUI.innerText = name;
             document.getElementById('start-screen').classList.add('hidden');
             document.getElementById('stats').classList.remove('hidden');
             document.getElementById('timer-box').classList.remove('hidden');
@@ -506,7 +526,6 @@
             document.getElementById('pause-screen').classList.toggle('hidden');
             const bp = document.getElementById('btn-pause');
             bp.innerText = isPaused ? "REANUDAR" : "PAUSA";
-            bp.classList.toggle('bg-yellow-500'); bp.classList.toggle('bg-green-600');
         }
 
         function startTimer(sec) {
@@ -515,15 +534,15 @@
         }
 
         function updateTimerDisplay() {
-            document.getElementById('timer-ui').innerText = `00:${timeLeft < 10 ? '0'+timeLeft : timeLeft}`;
-            const b = document.getElementById('timer-box');
-            timeLeft < 10 ? b.classList.add('timer-warning') : b.classList.remove('timer-warning');
+            const tUI = document.getElementById('timer-ui'); if(tUI) tUI.innerText = `00:${timeLeft < 10 ? '0'+timeLeft : timeLeft}`;
+            const b = document.getElementById('timer-box'); if(b) { if(timeLeft < 10) b.classList.add('timer-warning'); else b.classList.remove('timer-warning'); }
         }
 
-        function retryContinue() { document.getElementById('game-over').classList.add('hidden'); gameActive = true; startTimer(40); animate(); }
+        function retryContinue() { document.getElementById('game-over').classList.add('hidden'); gameActive = true; startTimer(40); animate(); showStatus("RECARGADO", "#2563eb"); }
         
         function downloadWallpaper() {
-            const name = document.getElementById('player-name').value.toUpperCase();
+            const nInput = document.getElementById('player-name');
+            const name = (nInput && nInput.value ? nInput.value : "Explorador").toUpperCase();
             const tr = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
             tr.setSize(1920, 1080);
             const tc = camera.clone(); tc.aspect = 1920/1080; tc.updateProjectionMatrix();
@@ -536,9 +555,9 @@
             cx.textAlign = 'left'; cx.shadowColor = "black"; cx.shadowBlur = 5;
             cx.fillStyle = '#60a5fa'; cx.font = 'bold 24px Arial'; cx.fillText("PROYECTO: AIVA ACADEMIA", 70, 830);
             cx.fillStyle = '#ffffff'; cx.font = 'black 80px Arial'; cx.fillText(name, 70, 910);
-            cx.font = 'bold 36px Arial'; cx.fillStyle = '#ffd700'; cx.fillText(`MAESTRO CONSTRUCTOR | NIVEL: ${currentLevel}`, 70, 960);
+            cx.font = 'bold 36px Arial'; cx.fillStyle = '#ffd700'; cx.fillText(`AIVA CONSTRUCTOR | NIVEL: ${currentLevel}`, 70, 960);
             cx.font = 'bold 42px Arial'; cx.fillStyle = '#4ade80'; cx.fillText(`PUNTAJE LOGRADO: ${score}`, 70, 1010);
-            const link = document.createElement('a'); link.download = `AIVA_Quest_${name}.jpg`; link.href = cv.toDataURL('image/jpeg', 0.95); link.click(); tr.dispose();
+            const link = document.createElement('a'); link.download = `AIVA_Voxel_Quest_${name}.jpg`; link.href = cv.toDataURL('image/jpeg', 0.95); link.click(); tr.dispose();
         }
 
         function showInstructions() { document.getElementById('instructions-modal').classList.remove('hidden'); }
@@ -570,7 +589,7 @@
             if(t==='bench') { g.add(new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 0.6), mat(c.wood))).position.y=0.4; g.add(new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.4, 0.5), mat(c.stone))).position.y=0.2; }
             if(t==='lamp') { g.add(new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.5, 0.2), mat(0x333333))).position.y=1.25; g.add(new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.3, 0.6), mat(0xffffaa))).position.y=2.5; }
             if(t==='flower') { g.add(new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.5, 0.1), mat(0x228b22))).position.y=0.25; g.add(new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.1, 0.4), mat(c.flower))).position.y=0.5; }
-            if(t==='cloud') { for(let i=0; i<5; i++) { let b = new THREE.Mesh(new THREE.BoxGeometry(1, 0.6, 0.8), mat(c.cloud)); b.position.set(Math.random()*1.5-0.7, Math.random()*0.5, Math.random()*1.5-0.7); g.add(b); } }
+            if(t==='cloud') { for(let i=0; i<5; i++) { let b = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.7, 1.0), mat(c.cloud)); b.position.set(Math.random()*1.5-0.7, Math.random()*0.5, Math.random()*1.5-0.7); g.add(b); } }
             return g;
         }
     </script>
